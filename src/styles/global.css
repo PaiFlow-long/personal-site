@@ -4,8 +4,26 @@
    主题切换靠 html[data-theme]，由 BaseLayout 的内联脚本在首屏前写入
    ============================================================ */
 
+/* 自托管展示字体（Fraunces 拉丁子集，可变字重 400–700）。
+   自托管而非引 Google Fonts —— 保证国内访问速度、不依赖被墙的 CDN。 */
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/fraunces-latin-var.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+
 :root {
   color-scheme: light;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, 'Times New Roman', serif;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
   --bg: #fff7ec;
   --card: #fffdf8;
@@ -27,8 +45,7 @@
   --maxw: 1000px;
   --header-h: 62px;
 
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
-    'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  font-family: var(--font-sans);
 }
 
 /* 夜间主题变量。下面 @media 里那一份是给「禁用 JS」时的兜底，改色请两处同步 */
@@ -103,19 +120,45 @@ header.site {
 }
 .bar { display: flex; align-items: center; gap: 14px; height: var(--header-h); }
 
+/* 品牌位：logo + 文字标（衬线 Latin ｜ 发丝线 ｜ 字距化中文） */
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 11px;
   color: var(--fg);
-  font-weight: 700;
-  letter-spacing: 0.01em;
   flex: 0 0 auto;
 }
 .brand:hover { text-decoration: none; color: var(--fg); }
-.brand-name { font-size: 1rem; white-space: nowrap; }
-.brand .logo-mark { transition: transform 0.3s ease; }
-.brand:hover .logo-mark { transform: rotate(-8deg) scale(1.06); }
+
+.brand-mark { transition: transform 0.55s var(--ease-out); }
+.brand:hover .brand-mark { transform: rotate(-10deg) scale(1.08); }
+
+.wordmark { display: inline-flex; align-items: center; gap: 10px; }
+.wm-latin {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.3rem;
+  line-height: 1;
+  letter-spacing: -0.012em;
+  font-optical-sizing: auto;
+  color: var(--fg);
+}
+.wm-rule {
+  width: 1px;
+  height: 15px;
+  background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+  transition: transform 0.35s var(--ease-out);
+}
+.brand:hover .wm-rule { transform: scaleY(1.25); }
+.wm-cn {
+  font-size: 0.94rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  margin-right: -0.2em; /* 抵消末字多出的字距，保证视觉居中 */
+  color: var(--fg);
+  transition: letter-spacing 0.35s var(--ease-out);
+}
+.brand:hover .wm-cn { letter-spacing: 0.3em; }
 
 .panel { margin-left: auto; display: flex; align-items: center; gap: 16px; }
 
@@ -184,47 +227,148 @@ main {
   flex-direction: column;
   padding: 40px 0 64px;
 }
-/* 首页：整屏舞台，不加内边距 */
-main > .stage { padding-top: 64px; }
+/* 首页：hero 自己撑满，去掉内边距 */
+main.bleed { padding: 0; }
 
 h1 { font-size: 1.9rem; margin: 0 0 6px; letter-spacing: -0.01em; }
 h2 { font-size: 1.25rem; }
 .lead { color: var(--muted); max-width: 680px; margin: 0 0 22px; }
 
-/* ---------------- 首页视觉舞台 ---------------- */
-.stage {
+/* ---------------- 首页：全屏 hero ---------------- */
+.hero {
   position: relative;
   flex: 1;
+  min-height: calc(100svh - var(--header-h));
   display: grid;
-  place-content: center;
-  justify-items: center;
-  gap: 30px;
-  text-align: center;
-  padding: 64px 24px 88px;
+  place-items: center;
   overflow: hidden;
+  isolation: isolate;
 }
-.stage::before {
+
+/* 大视觉层：默认是品牌色的「晨光」氛围。
+   想换成一整张真照片，给 .hero 加内联 style="--hero-image:url('/hero.jpg')" 即可。 */
+.hero-visual {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-color: color-mix(in srgb, var(--gold) 12%, var(--bg));
+  /* 换大图：替换 public/hero.png 即可；
+     想用别的图，给 .hero 传内联 style="--hero-image:url('/xxx.jpg')" */
+  background-image: var(--hero-image, url('/hero.png'));
+  background-size: cover;
+  background-position: center 42%;
+}
+/* 可读性蒙版：蒙版色用 var(--bg)，于是浅色模式自动变奶油、深色模式自动压暗，
+   一套规则让压在照片上的大字在任何主题下都读得清 */
+.hero-visual::before {
   content: '';
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(closest-side at 50% 30%, color-mix(in srgb, var(--gold) 38%, transparent), transparent 72%),
-    radial-gradient(closest-side at 16% 84%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 74%),
-    radial-gradient(closest-side at 86% 14%, color-mix(in srgb, var(--accent) 13%, transparent), transparent 70%);
+    radial-gradient(62% 56% at 50% 44%, color-mix(in srgb, var(--bg) 40%, transparent), transparent 78%),
+    linear-gradient(to bottom,
+      color-mix(in srgb, var(--bg) 62%, transparent) 0%,
+      color-mix(in srgb, var(--bg) 26%, transparent) 36%,
+      color-mix(in srgb, var(--bg) 18%, transparent) 56%,
+      color-mix(in srgb, var(--bg) 86%, transparent) 100%);
 }
-.stage > * { position: relative; }
-.stage-mark {
-  width: clamp(120px, 24vw, 190px);
-  height: auto;
-  filter: drop-shadow(0 22px 40px rgba(232, 72, 43, 0.18));
+/* 颗粒层：让渐变有质感，而不是廉价的数字渐变 */
+.hero-visual::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
-.stage h1 {
+:root[data-theme='dark'] .hero-visual { background-color: color-mix(in srgb, var(--gold) 9%, var(--bg)); }
+:root[data-theme='dark'] .hero-visual::after { mix-blend-mode: screen; opacity: 0.06; }
+
+/* 底部渐隐，让 hero 平滑接入页面 */
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent 58%, color-mix(in srgb, var(--bg) 88%, transparent));
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 940px;
+  padding: 24px;
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+}
+.hero-mark { display: inline-block; filter: drop-shadow(0 20px 34px rgba(232, 72, 43, 0.22)); }
+.hero-eyebrow {
+  margin: 2px 0 0;
+  font-size: clamp(0.72rem, 1.7vw, 0.84rem);
+  font-weight: 600;
+  letter-spacing: 0.42em;
+  text-indent: 0.42em;
+  color: var(--muted);
+  text-shadow: 0 1px 16px color-mix(in srgb, var(--bg) 82%, transparent);
+}
+.hero-title {
   margin: 0;
-  font-size: clamp(1.85rem, 6.4vw, 3.9rem);
-  line-height: 1.18;
-  letter-spacing: -0.02em;
-  font-weight: 700;
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: clamp(2.5rem, 8.6vw, 5.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+  text-wrap: balance;
+  text-shadow: 0 2px 30px color-mix(in srgb, var(--bg) 78%, transparent);
 }
+.hero-sub {
+  margin: 4px 0 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(0.98rem, 2.5vw, 1.5rem);
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--fg) 72%, var(--muted));
+  text-shadow: 0 1px 18px color-mix(in srgb, var(--bg) 82%, transparent);
+}
+
+/* 滚动提示 */
+.hero-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.66rem;
+  letter-spacing: 0.32em;
+  text-indent: 0.32em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.hero-cue::after {
+  content: '';
+  width: 1px;
+  height: 32px;
+  background: linear-gradient(to bottom, var(--muted), transparent);
+  animation: cueDrop 2.2s ease-in-out infinite;
+}
+@keyframes cueDrop {
+  0%, 100% { transform: scaleY(0.25); transform-origin: top; opacity: 0.35; }
+  50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
+}
+
+/* 入场：大字逐段浮现（错峰节奏由各元素内联 animation-delay 控制） */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(24px); filter: blur(7px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+.hero .reveal { opacity: 0; animation: rise 1.05s var(--ease-out) both; }
 
 /* ---------------- 卡片 / 列表 ---------------- */
 .grid {
@@ -330,6 +474,59 @@ footer.site {
 .foot-nav a:hover { color: var(--fg); }
 .foot-tagline { margin: 0; width: 100%; color: color-mix(in srgb, var(--muted) 80%, transparent); font-size: 0.78rem; }
 
+/* ---------------- 底部宣言签名带（全站收尾） ---------------- */
+.slogan-band {
+  position: relative;
+  padding: 78px 22px 86px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  background: radial-gradient(60% 130% at 50% 0%, color-mix(in srgb, var(--gold) 18%, transparent), transparent 72%);
+}
+.band-inner { display: grid; justify-items: center; gap: 15px; }
+.band-mark { filter: drop-shadow(0 12px 22px rgba(232, 72, 43, 0.16)); }
+.band-cn {
+  position: relative;
+  margin: 6px 0 0;
+  font-size: clamp(1.7rem, 5.4vw, 3.1rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  color: var(--fg);
+}
+.band-cn::after {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 2px;
+  margin: 20px auto 0;
+  border-radius: 2px;
+  background: var(--accent);
+}
+.band-en {
+  margin: 2px 0 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(0.92rem, 2.3vw, 1.28rem);
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+/* 滚动浮现（仅在有 JS 时启用，避免无脚本时内容被藏） */
+html.js .reveal-on-scroll { opacity: 0; transform: translateY(28px); transition: opacity 0.85s var(--ease-out), transform 0.85s var(--ease-out); }
+html.js .reveal-on-scroll.in { opacity: 1; transform: none; }
+
+/* 降低动效偏好：全部动效降级为静态 */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hero .reveal { opacity: 1; animation: none; }
+  .hero-cue::after { animation: none; }
+  .hero-cue::after { opacity: 0.6; }
+  html.js .reveal-on-scroll { opacity: 1; transform: none; transition: none; }
+  .brand-mark,
+  .wm-rule,
+  .wm-cn { transition: none; }
+}
+
 /* ---------------- 表单 / 正文 ---------------- */
 form.contact { display: grid; gap: 12px; max-width: 520px; }
 form.contact label { font-size: 0.85rem; color: var(--muted); display: grid; gap: 4px; }
@@ -397,4 +594,8 @@ article.prose img { max-width: 100%; border-radius: 10px; }
   .main-nav a { padding: 10px 12px; font-size: 0.95rem; }
   .controls { justify-content: space-between; }
   .foot-nav { margin-left: 0; width: 100%; }
+  .wm-latin { font-size: 1.18rem; }
+  .wm-cn { font-size: 0.86rem; letter-spacing: 0.16em; }
+  .wordmark { gap: 8px; }
+  .hero-inner { gap: 13px; }
 }

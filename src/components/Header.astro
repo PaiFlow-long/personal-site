@@ -10,8 +10,12 @@ const isActive = (p: string) => (p === '/' ? path === '/' : path.startsWith(p))
 <header class="site">
   <div class="container bar">
     <a class="brand" href="/" aria-label={SITE.brand}>
-      <LogoMark size={26} />
-      <span class="brand-name">{SITE.brand}</span>
+      <LogoMark size={30} class="brand-mark" />
+      <span class="wordmark">
+        <span class="wm-latin">PaiFlow</span>
+        <span class="wm-rule" aria-hidden="true"></span>
+        <span class="wm-cn">苹果派</span>
+      </span>
     </a>
 
     <button class="icon-btn menu-btn" type="button" data-menu-btn aria-expanded="false" data-i18n-aria="ui.menu" aria-label={t(DEFAULT_LANG, 'ui.menu')}>

@@ -1,17 +1,26 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro'
 import LogoMark from '../components/LogoMark.astro'
+import { SITE } from '../data/site'
 ---
 
 <BaseLayout bleed>
-  <section class="stage">
-    <LogoMark size={190} class="stage-mark" />
-    <!-- 大字内容在 src/i18n/ui.ts 的 brand.slogan 里改，三语同步 -->
-    <h1 data-i18n="brand.slogan">无限不循环的小派</h1>
+  <section class="hero">
+    <!-- 全屏大视觉：默认加载 public/hero.png（暖调苹果园晨光，中心留白给大字）。
+         换图：直接替换 public/hero.png；或用别的图时给本 section 加
+         style="--hero-image:url('/other.jpg')" -->
+    <div class="hero-visual" aria-hidden="true"></div>
+    <div class="hero-scrim" aria-hidden="true"></div>
 
-    <!--
-      预留位：后期交互（大图 / 滚动引导 / 动效）加在这里。
-      若要换成一张大图，把上面的 LogoMark 换成 <img src="/hero.png" alt="" class="stage-mark" /> 即可。
-    -->
+    <div class="hero-inner">
+      <span class="hero-mark reveal" style="animation-delay:.1s"><LogoMark size={76} /></span>
+      <p class="hero-eyebrow reveal" style="animation-delay:.3s">{SITE.slogan}</p>
+      <h1 class="hero-title reveal" style="animation-delay:.52s">{SITE.statement.cn}</h1>
+      <p class="hero-sub reveal" style="animation-delay:.8s">{SITE.statement.en}</p>
+    </div>
+
+    <span class="hero-cue reveal" style="animation-delay:1.08s" aria-hidden="true">Scroll</span>
+
+    <!-- 预留位：后期交互（视差 / 滚动引导 / 鼠标跟随）加在这里。 -->
   </section>
 </BaseLayout>
