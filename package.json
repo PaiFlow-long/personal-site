@@ -13,5 +13,9 @@
   "dependencies": {
     "astro": "^5.0.0",
     "@astrojs/cloudflare": "^12.0.0"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "*",
+    "@rollup/rollup-linux-arm64-gnu": "*"
   }
 }
