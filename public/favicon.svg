@@ -1,4 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="7" fill="#E8482B" />
-  <text x="16" y="23" font-size="20" font-family="Georgia, serif" font-style="italic" fill="#fff" text-anchor="middle">π</text>
+<svg width="64" height="64" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="PaiFlow苹果派">
+  <rect width="100" height="100" rx="22" fill="#FFF7EC"/>
+  <circle cx="50" cy="62" r="28" fill="#E8A85C" stroke="#C8853F" stroke-width="6"/>
+  <circle cx="50" cy="62" r="24" fill="none" stroke="#F4C97E" stroke-width="2.4" opacity=".55"/>
+  <circle cx="50" cy="62" r="19" fill="#FFF3DF" stroke="#E0A458" stroke-width="3"/>
+  <circle cx="42" cy="58" r="3.3" fill="#3A2A1A"/>
+  <circle cx="58" cy="58" r="3.3" fill="#3A2A1A"/>
+  <path d="M43 68.5 Q50 75.5 57 68.5" fill="none" stroke="#3A2A1A" stroke-width="3.2" stroke-linecap="round"/>
+  <rect x="47.6" y="1.6" width="4.8" height="9" rx="2.4" fill="#7A4A22"/>
+  <circle cx="50" cy="20.5" r="13" fill="#E8482B"/>
+  <path d="M53 10.5 q9 -8.5 15.5 -2.5" fill="none" stroke="#5BA85B" stroke-width="4.4" stroke-linecap="round"/>
+  <ellipse cx="45" cy="16.5" rx="3.8" ry="5.6" fill="#ffffff" opacity=".35"/>
 </svg>

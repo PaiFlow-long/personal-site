@@ -1,0 +1,42 @@
+---
+import { getCollection } from 'astro:content'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { DEFAULT_LANG, t } from '../../i18n/ui'
+
+const videos = (await getCollection('videos')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+)
+
+const platformLabel: Record<string, string> = {
+  bilibili: 'Bilibili',
+  youtube: 'YouTube',
+  douyin: '抖音',
+  other: '视频',
+}
+---
+
+<BaseLayout titleKey="videos" description="PaiFlow苹果派 · 视频">
+  <h1 data-i18n="nav.videos">{t(DEFAULT_LANG, 'nav.videos')}</h1>
+  <p class="lead" data-i18n="ui.videos.lead">{t(DEFAULT_LANG, 'ui.videos.lead')}</p>
+
+  {
+    videos.length === 0 ? (
+      <div class="empty" data-i18n="ui.videos.empty">
+        {t(DEFAULT_LANG, 'ui.videos.empty')}
+      </div>
+    ) : (
+      <div class="grid">
+        {videos.map((v) => (
+          <a class="card project external" href={v.data.url} target="_blank" rel="noopener">
+            <div class="proj-head">
+              <h3>{v.data.title}</h3>
+              <span class="ext-badge">{platformLabel[v.data.platform] ?? '↗'}</span>
+            </div>
+            <p class="meta">{v.data.date.toLocaleDateString('zh-CN')}</p>
+            {v.data.summary && <p>{v.data.summary}</p>}
+          </a>
+        ))}
+      </div>
+    )
+  }
+</BaseLayout>

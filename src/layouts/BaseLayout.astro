@@ -1,14 +1,125 @@
 ---
-import '../styles/global.css';
+import '../styles/global.css'
+import { SITE, NAV } from '../data/site'
+import { UI, LANGUAGES, DEFAULT_LANG, t } from '../i18n/ui'
+import Header from '../components/Header.astro'
+import Footer from '../components/Footer.astro'
 
 interface Props {
-  title?: string;
-  description?: string;
+  /** 直接指定页面名（用于文章详情页，传文章标题） */
+  title?: string
+  /** 用栏目 key 指定页面名，如 'articles' → 「PaiFlow苹果派 · 文章」 */
+  titleKey?: string
+  description?: string
+  /** 首页用：不加居中容器，整屏铺开 */
+  bleed?: boolean
 }
 const {
-  title = '小派 · PaiFlow苹果派',
-  description = '无限不循环的小派 · 个人展示 · 项目管理 · 研究与动态',
-} = Astro.props;
+  title,
+  titleKey,
+  description = `${SITE.slogan} · ${SITE.brand}`,
+  bleed = false,
+} = Astro.props
+
+const pageName = titleKey ? t(DEFAULT_LANG, `nav.${titleKey}`) : title
+const fullTitle = pageName ? `${SITE.brand} · ${pageName}` : SITE.brand
+
+// 把界面文案字典注入到客户端，供中/EN/繁切换使用（纯前端切换，无路由变化）
+const payload = JSON.stringify({
+  dict: UI,
+  languages: LANGUAGES,
+  defaultLang: DEFAULT_LANG,
+  brand: SITE.brand,
+  keys: NAV.map((n) => n.key),
+}).replace(/</g, '\\u003c')
+
+const clientScript = `
+(function () {
+  var D = ${payload};
+  var LS_T = 'paiflow.theme', LS_L = 'paiflow.lang';
+  var root = document.documentElement;
+  var mq = window.matchMedia('(prefers-color-scheme: dark)');
+
+  function read(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function write(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  /* ---- 主题：立即应用，避免闪白 ---- */
+  function currentTheme() { return read(LS_T) || (mq.matches ? 'dark' : 'light'); }
+  root.setAttribute('data-theme', currentTheme());
+
+  /* ---- 语言：若非默认语言，先隐藏内容，避免中文闪一下 ---- */
+  var lang = read(LS_L) || D.defaultLang;
+  if (!D.dict[lang]) lang = D.defaultLang;
+  if (lang !== D.defaultLang) {
+    root.classList.add('i18n-pending');
+    setTimeout(function () { root.classList.remove('i18n-pending'); }, 1200);
+  }
+
+  function applyLang(l) {
+    var d = D.dict[l];
+    if (!d) return;
+    root.setAttribute('lang', l === 'zh-TW' ? 'zh-Hant' : l);
+    root.setAttribute('data-lang', l);
+
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var v = d[el.getAttribute('data-i18n')];
+      if (v != null) el.textContent = v;
+    });
+    document.querySelectorAll('[data-i18n-aria]').forEach(function (el) {
+      var v = d[el.getAttribute('data-i18n-aria')];
+      if (v != null) el.setAttribute('aria-label', v);
+    });
+
+    var body = document.body;
+    var tk = body && body.getAttribute('data-title-key');
+    var raw = body && body.getAttribute('data-title-text');
+    var name = tk ? (d['nav.' + tk] || '') : (raw || '');
+    document.title = name ? (D.brand + ' · ' + name) : D.brand;
+
+    document.querySelectorAll('[data-lang]').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === l));
+    });
+  }
+
+  function boot() {
+    applyLang(lang);
+    root.classList.remove('i18n-pending');
+
+    var tb = document.querySelector('[data-theme-btn]');
+    if (tb) tb.addEventListener('click', function () {
+      var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      write(LS_T, next);
+    });
+
+    document.querySelectorAll('[data-lang]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        lang = b.getAttribute('data-lang');
+        write(LS_L, lang);
+        applyLang(lang);
+      });
+    });
+
+    var mb = document.querySelector('[data-menu-btn]');
+    var panel = document.querySelector('[data-panel]');
+    if (mb && panel) {
+      mb.addEventListener('click', function () {
+        var open = panel.hasAttribute('data-open');
+        if (open) { panel.removeAttribute('data-open'); } else { panel.setAttribute('data-open', ''); }
+        mb.setAttribute('aria-expanded', String(!open));
+      });
+    }
+  }
+
+  /* 系统主题变化时跟随（仅当用户没手动选过） */
+  var onSystem = function (e) { if (!read(LS_T)) root.setAttribute('data-theme', e.matches ? 'dark' : 'light'); };
+  if (mq.addEventListener) mq.addEventListener('change', onSystem);
+  else if (mq.addListener) mq.addListener(onSystem);
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+`
 ---
 
 <!doctype html>
@@ -16,28 +127,24 @@ const {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>{title}</title>
+    <title>{fullTitle}</title>
     <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#FFF7EC" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1a1512" media="(prefers-color-scheme: dark)" />
+
+    <meta property="og:type" content={title ? 'article' : 'website'} />
+    <meta property="og:site_name" content={SITE.brand} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+
+    <script is:inline set:html={clientScript} />
   </head>
-  <body>
-    <header class="site">
-      <div class="container">
-        <a class="brand" href="/">🥧 小派</a>
-        <nav>
-          <a href="/articles">文章</a>
-          <a href="/projects">项目</a>
-          <a href="/insights">资讯</a>
-          <a href="/about">关于</a>
-          <a href="/contact">联系</a>
-        </nav>
-      </div>
-    </header>
-    <main class="container">
+  <body data-title-key={titleKey} data-title-text={titleKey ? undefined : title}>
+    <Header />
+    <main class={bleed ? '' : 'container'}>
       <slot />
     </main>
-    <footer class="site">
-      <div class="container">© {new Date().getFullYear()} 小派 · PaiFlow苹果派</div>
-    </footer>
+    <Footer />
   </body>
 </html>

@@ -1,15 +1,16 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { DEFAULT_LANG, t } from '../../i18n/ui';
 
 const articles = (await getCollection('articles')).sort(
   (a, b) => b.data.date.getTime() - a.data.date.getTime()
 );
 ---
 
-<BaseLayout title="文章" description="个人展示 / 文章">
-  <h1>文章 / 个人展示</h1>
-  <p class="lead">随笔、研究与思考。</p>
+<BaseLayout titleKey="articles" description="PaiFlow苹果派 · 文章">
+  <h1 data-i18n="nav.articles">{t(DEFAULT_LANG, 'nav.articles')}</h1>
+  <p class="lead" data-i18n="ui.articles.lead">{t(DEFAULT_LANG, 'ui.articles.lead')}</p>
   <div class="grid">
     {
       articles.map((a) => (

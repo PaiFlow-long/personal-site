@@ -8,5 +8,5 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   output: 'static',
   adapter: cloudflare(),
-  site: 'https://your-domain.pages.dev',
+  site: 'https://paiflow.pages.dev',
 });

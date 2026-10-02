@@ -17,7 +17,9 @@ const external = Boolean(url);
         <h3>{title}</h3>
         <span class="ext-badge">↗ 子站</span>
       </div>
-      <span class={`tag status-${status}`}>{statusLabel[status]}</span>
+      <span class={`tag status-${status}`} data-i18n={`ui.status.${status}`}>
+        {statusLabel[status]}
+      </span>
       {summary && <p>{summary}</p>}
       {
         timeline && timeline.length > 0 && (
@@ -36,7 +38,9 @@ const external = Boolean(url);
     <article class="card project">
       <div class="proj-head">
         <h3>{title}</h3>
-        <span class={`tag status-${status}`}>{statusLabel[status]}</span>
+        <span class={`tag status-${status}`} data-i18n={`ui.status.${status}`}>
+          {statusLabel[status]}
+        </span>
       </div>
       {summary && <p>{summary}</p>}
       {

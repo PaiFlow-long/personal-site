@@ -1,0 +1,26 @@
+---
+import { SITE, NAV } from '../data/site'
+import { DEFAULT_LANG, t } from '../i18n/ui'
+import LogoMark from './LogoMark.astro'
+
+const year = new Date().getFullYear()
+---
+
+<footer class="site">
+  <div class="container foot">
+    <div class="foot-brand">
+      <LogoMark size={20} />
+      <span>© {year} {SITE.brand}</span>
+    </div>
+    <nav class="foot-nav" aria-label="Footer">
+      {
+        NAV.filter((i) => i.path !== '/').map((item) => (
+          <a href={item.path} data-i18n={`nav.${item.key}`}>
+            {t(DEFAULT_LANG, `nav.${item.key}`)}
+          </a>
+        ))
+      }
+    </nav>
+    <p class="foot-tagline" data-i18n="ui.footer.tagline">{t(DEFAULT_LANG, 'ui.footer.tagline')}</p>
+  </div>
+</footer>
