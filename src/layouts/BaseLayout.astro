@@ -6,8 +6,8 @@ interface Props {
   description?: string;
 }
 const {
-  title = '个人站',
-  description = '个人展示 · 项目管理 · 消息咨询',
+  title = '小派 · PaiFlow苹果派',
+  description = '无限不循环的小派 · 个人展示 · 项目管理 · 研究与动态',
 } = Astro.props;
 ---
 
@@ -23,7 +23,7 @@ const {
   <body>
     <header class="site">
       <div class="container">
-        <a class="brand" href="/">◈ pai</a>
+        <a class="brand" href="/">🥧 小派</a>
         <nav>
           <a href="/articles">文章</a>
           <a href="/projects">项目</a>
@@ -37,7 +37,7 @@ const {
       <slot />
     </main>
     <footer class="site">
-      <div class="container">© {new Date().getFullYear()} pai · 个人主页</div>
+      <div class="container">© {new Date().getFullYear()} 小派 · PaiFlow苹果派</div>
     </footer>
   </body>
 </html>

@@ -1,14 +1,15 @@
 :root {
-  --bg: #fbfbfa;
-  --fg: #1a1a1a;
-  --muted: #6b7280;
-  --card: #ffffff;
-  --border: #e7e7e4;
-  --accent: #2563eb;
-  --accent-soft: #eff4ff;
-  --green: #16a34a;
-  --amber: #d97706;
-  --gray: #9ca3af;
+  --bg: #FFF7EC;
+  --fg: #2b2420;
+  --muted: #8c7d6e;
+  --card: #FFFDF8;
+  --border: #f0e2cd;
+  --accent: #E8482B;
+  --accent-soft: #fde8e3;
+  --gold: #E0A458;
+  --green: #2f9e54;
+  --amber: #d9882b;
+  --gray: #9b8e80;
   --radius: 14px;
   --maxw: 960px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
@@ -16,13 +17,16 @@
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0f1115;
-    --fg: #e8eaed;
-    --muted: #9aa0a6;
-    --card: #171a21;
-    --border: #262b34;
-    --accent: #5b8cff;
-    --accent-soft: #16233f;
+    --bg: #1f1a16;
+    --fg: #f5ece0;
+    --muted: #b6a690;
+    --card: #2a231d;
+    --border: #3a3029;
+    --accent: #ff6b4a;
+    --accent-soft: #3a201c;
+    --gold: #e9b06a;
+    --green: #5bc47f;
+    --amber: #e7a94e;
   }
 }
 * { box-sizing: border-box; }
@@ -51,7 +55,12 @@ header.site .container {
 nav a { margin-left: 18px; color: var(--muted); font-size: .92rem; }
 nav a:hover { color: var(--fg); text-decoration: none; }
 main { padding: 40px 0 64px; min-height: 60vh; }
-.hero { padding: 36px 0 12px; }
+.hero {
+  padding: 40px 30px 30px; margin: 4px 0 12px;
+  background: linear-gradient(135deg, var(--accent-soft), #fff3df);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
 .hero h1 { font-size: 2.2rem; margin: 0 0 8px; letter-spacing: -.5px; }
 .hero .sub { color: var(--muted); font-size: 1.05rem; max-width: 640px; }
 .lead { color: var(--muted); }
@@ -65,7 +74,7 @@ main { padding: 40px 0 64px; min-height: 60vh; }
   padding: 18px; transition: transform .15s ease, box-shadow .15s ease;
   color: var(--fg); display: block;
 }
-.card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.06); text-decoration: none; }
+.card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(232,72,43,.10); text-decoration: none; }
 .card h3 { margin: 0 0 6px; font-size: 1.1rem; color: var(--fg); }
 .card .meta { color: var(--muted); font-size: .82rem; margin: 0; }
 .card p { color: var(--muted); font-size: .9rem; margin: 6px 0 0; }
@@ -76,22 +85,23 @@ main { padding: 40px 0 64px; min-height: 60vh; }
 .status-active { background: #e7f6ec; color: var(--green); }
 .status-paused { background: #fdf2e2; color: var(--amber); }
 .status-done { background: #f1f1f1; color: var(--gray); }
-.status-planned { background: #eef2ff; color: var(--accent); }
+.status-planned { background: #fff1dd; color: var(--gold); }
 .timeline { list-style: none; padding: 0; margin: 12px 0 0; border-left: 2px solid var(--border); }
 .timeline li { position: relative; padding: 4px 0 4px 18px; font-size: .85rem; }
 .timeline li::before {
   content: ""; position: absolute; left: -7px; top: 10px;
-  width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
+  width: 10px; height: 10px; border-radius: 50%; background: var(--gold);
 }
 .t-date { color: var(--muted); margin-right: 8px; font-variant-numeric: tabular-nums; }
 .section-title { display: flex; align-items: baseline; justify-content: space-between; margin: 30px 0 4px; }
 .section-title h2 { font-size: 1.3rem; margin: 0; }
+.section-title h2::before { content: "🥧 "; }
 .intro { color: var(--muted); max-width: 680px; margin: 14px 0 18px; font-size: 1rem; }
 .cta { display: inline-block; padding: 10px 18px; border-radius: 10px; background: var(--accent); color: #fff; font-weight: 600; }
 .cta:hover { text-decoration: none; opacity: .92; }
 .proj-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.ext-badge { font-size: .7rem; font-weight: 700; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
-.card.project.external { border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); }
+.ext-badge { font-size: .7rem; font-weight: 700; color: var(--gold); border: 1px solid var(--gold); border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
+.card.project.external { border-color: color-mix(in srgb, var(--gold) 45%, var(--border)); }
 footer.site { border-top: 1px solid var(--border); color: var(--muted); font-size: .85rem; padding: 22px 0; }
 form.contact { display: grid; gap: 12px; max-width: 520px; }
 form.contact label { font-size: .85rem; color: var(--muted); display: grid; gap: 4px; }
