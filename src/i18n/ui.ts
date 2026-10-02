@@ -51,7 +51,8 @@ const zhCN: Dict = {
   'ui.contact.submit': '提交留言',
   'ui.contact.note': '说明：正式版将通过 Cloudflare Worker 写入 D1，并邮件通知。',
 
-  'ui.quote.label': '今日一句',
+  'ui.quote.label': '风中的纸屑',
+  'ui.quote.next': '换一条',
   'ui.quote.scroll': '下滑',
 }
 
@@ -87,7 +88,8 @@ const zhTW: Dict = {
   'ui.contact.submit': '送出留言',
   'ui.contact.note': '說明：正式版將透過 Cloudflare Worker 寫入 D1，並以郵件通知。',
 
-  'ui.quote.label': '今日一句',
+  'ui.quote.label': '風中的紙屑',
+  'ui.quote.next': '換一條',
   'ui.quote.scroll': '下滑',
 }
 
@@ -123,7 +125,8 @@ const en: Dict = {
   'ui.contact.submit': 'Send',
   'ui.contact.note': 'Note: the production version will write to Cloudflare D1 and notify by email.',
 
-  'ui.quote.label': 'Quote of the day',
+  'ui.quote.label': 'Scraps in the Wind',
+  'ui.quote.next': 'Another scrap',
   'ui.quote.scroll': 'Scroll',
 }
 

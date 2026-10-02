@@ -1,10 +1,11 @@
 ---
 /**
- * 今日一句 · 第二屏
+ * 风中的纸屑 · 第二屏
  *
  * 内容来自 src/data/quotes.md（加句子改那个文件即可，这里不用动）。
- * 按「日期序号」抽一条 —— 同一天无论刷新几次都是同一句，隔天自动换，
+ * 默认按「日期序号取模」抽一条 —— 同一天无论刷新几次都是同一句，隔天自动换，
  * 且因为是顺序取模，连续两天不会撞到同一句。
+ * 点 hero 里的小派 logo 会随机换一条（不等日期）。
  * 纯前端运行，不需要后端或第三方接口，也就不存在「抓取失败」的空窗。
  *
  * 打字机在区块滚进视口时才开始，避免用户滑下来时字早打完了。
@@ -47,14 +48,20 @@ const first = pool[0]
     }
     if (!pool.length) return
 
-    /* ---- 每日一句：同一天恒定，隔天顺序前进 ----
-       用「今天是第几天」取模，而不是对日期做哈希 —— 取模能保证
+    var textEl = stage.querySelector('[data-tw-text]')
+    var ghostEl = stage.querySelector('[data-tw-ghost]')
+    var fullEl = stage.querySelector('[data-tw-full]')
+    var srcEl = stage.querySelector('[data-tw-src]')
+
+    /* ---- 抽签 ----
+       默认用「今天是第几天」取模，而不是对日期做哈希 —— 取模能保证
        连续两天一定不是同一句（哈希会有 1/N 的概率撞车）。
        想改成「每次刷新都随机」，把 dayIndex() 换成 Math.random() 即可。 */
     function dayIndex() {
       var d = new Date()
       return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000)
     }
+
     /* 调试用：网址加 ?q=12 就能直接看到第 12 条（编号＝quotes.md 里的序号）。
        正常访问不带参数，仍按日期自动抽。 */
     var forced = -1
@@ -62,45 +69,50 @@ const first = pool[0]
       forced = parseInt(new URLSearchParams(location.search).get('q') || '-1', 10)
     } catch (e) {}
     var auto = ((dayIndex() % pool.length) + pool.length) % pool.length
-    var q = forced >= 1 && forced <= pool.length ? pool[forced - 1] : pool[auto]
-
-    var textEl = stage.querySelector('[data-tw-text]')
-    var ghostEl = stage.querySelector('[data-tw-ghost]')
-    var fullEl = stage.querySelector('[data-tw-full]')
-    var srcEl = stage.querySelector('[data-tw-src]')
-
-    /* 长度分档：短句撑大字号独占一行，长句降字号当段落排（CSS 里按 data-len 切换） */
-    var chars = Array.from(q.text || '')
-    var len = chars.length
-    stage.setAttribute('data-len', len <= 25 ? 's' : len <= 60 ? 'm' : 'l')
-    /* 西文句换无衬线/展示字体 —— 楷体没有西文字形，硬套会退化成很难看的系统回退 */
-    var cjk = (q.text.match(/[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]/g) || []).length
-    if (cjk / Math.max(len, 1) < 0.25) stage.setAttribute('data-lang', 'en')
-
-    if (textEl) textEl.textContent = ''
-    if (ghostEl) ghostEl.textContent = q.text
-    if (fullEl) fullEl.textContent = q.text
-    if (srcEl) srcEl.textContent = q.author ? '— ' + q.author : ''
-
-    function showAll() {
-      if (textEl) textEl.textContent = q.text
-      stage.classList.add('typing-done')
-    }
+    var current = forced >= 1 && forced <= pool.length ? forced - 1 : auto
 
     var reduce =
       window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reduce || typeof IntersectionObserver === 'undefined') {
-      showAll()
-      return
+    var canType = !reduce && typeof IntersectionObserver !== 'undefined'
+
+    /* 每次换句都递增 seq，旧的那条打字循环看到 seq 变了就自己退出 */
+    var seq = 0
+    var started = false
+
+    /* 只把版面和文字层准备好（不打字、也不显示正文），供打字或直接显示复用 */
+    function paint(idx: number) {
+      current = idx
+      var q = pool[idx]
+      var text = (q.text as string) || ''
+      var len = Array.from(text).length
+
+      /* 长度分档：短句撑大字号独占一行，长句降字号当段落排（CSS 里按 data-len 切换） */
+      stage.setAttribute('data-len', len <= 25 ? 's' : len <= 60 ? 'm' : 'l')
+      /* 西文句换展示字体 —— 楷体没有西文字形，硬套会退化成很难看的系统回退 */
+      var cjk = (text.match(/[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]/g) || []).length
+      if (cjk / Math.max(len, 1) < 0.25) stage.setAttribute('data-lang', 'en')
+      else stage.removeAttribute('data-lang')
+
+      if (ghostEl) ghostEl.textContent = text
+      if (fullEl) fullEl.textContent = text
+      if (srcEl) srcEl.textContent = q.author ? '— ' + q.author : ''
+
+      seq++
+      stage.classList.remove('typing-done')
+      if (textEl) textEl.textContent = ''
     }
 
-    /* 逐字输出，间隔带随机抖动 —— 匀速会像机器，抖动才像人在打。
+    /* 逐字打字。间隔带随机抖动 —— 匀速会像机器，抖动才像人在打。
        长句要打快些，否则百字一句能让人等上十秒。 */
-    var base = len <= 25 ? 78 : len <= 60 ? 46 : 26
-    function type() {
+    function play(idx: number) {
+      paint(idx)
+      var chars = Array.from((pool[idx].text as string) || '')
+      var len = chars.length
+      var my = seq
+      var base = len <= 25 ? 78 : len <= 60 ? 46 : 26
       var i = 0
       ;(function step() {
-        if (!textEl) return
+        if (my !== seq || !textEl) return
         if (i >= len) {
           stage.classList.add('typing-done')
           return
@@ -110,13 +122,48 @@ const first = pool[0]
       })()
     }
 
+    /* 不打字，直接给全文（减少动效 / 无 IntersectionObserver 时） */
+    function showAll(idx: number) {
+      paint(idx)
+      if (textEl) textEl.textContent = (pool[idx].text as string) || ''
+      stage.classList.add('typing-done')
+    }
+
+    /* 点 hero 的小派 logo：随机换一条（不会抽到当前这条），并滑到第二屏 */
+    function next() {
+      var idx = current
+      if (pool.length > 1) {
+        while (idx === current) idx = Math.floor(Math.random() * pool.length)
+      }
+      started = true
+      if (canType) play(idx)
+      else showAll(idx)
+      if (stage.scrollIntoView) {
+        stage.scrollIntoView({ behavior: canType ? 'smooth' : 'auto', block: 'center' })
+      }
+    }
+    var mark = document.querySelector('.hero-mark')
+    if (mark) mark.addEventListener('click', next)
+
+    /* 首屏只备好版面：等滚进视口再打字，避免用户滑下来时字早打完了 */
+    paint(current)
+    if (!canType) {
+      showAll(current)
+      return
+    }
+
     var io = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (en) {
-          if (en.isIntersecting) {
-            io.unobserve(en.target)
-            setTimeout(type, 320)
-          }
+          if (!en.isIntersecting) return
+          io.unobserve(en.target)
+          if (started) return
+          started = true
+          var idx = current
+          setTimeout(function () {
+            /* 这 320ms 里如果被点了 logo，就交给点击那次去播 */
+            if (idx === current) play(idx)
+          }, 320)
         })
       },
       { threshold: 0.45 }

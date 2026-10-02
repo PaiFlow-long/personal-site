@@ -314,7 +314,29 @@ h2 { font-size: 1.25rem; }
   justify-items: center;
   gap: 16px;
 }
-.hero-mark { display: inline-block; filter: drop-shadow(0 20px 34px rgba(232, 72, 43, 0.22)); }
+/* 小派 logo 是个按钮：按一下随机换一条「风中的纸屑」，并滑到第二屏。
+   投影挂在子元素 svg 上 —— 因为 .hero .reveal 的 rise 动画（animation: both）
+   一直在动 filter，父元素自己的 filter 会被动画值覆盖掉。
+   悬停缩放用独立的 scale 属性：transform 被同一个动画占着，写 transform 不会生效。 */
+.hero-mark {
+  display: inline-block;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: scale 0.35s var(--ease-out);
+}
+.hero-mark svg {
+  display: block;
+  filter: drop-shadow(0 20px 34px rgba(232, 72, 43, 0.22));
+  transition: filter 0.35s var(--ease-out);
+}
+.hero-mark:hover { scale: 1.06; }
+.hero-mark:hover svg { filter: drop-shadow(0 26px 42px rgba(232, 72, 43, 0.32)); }
+.hero-mark:active { scale: 0.94; }
+.hero-mark:focus-visible { outline: 2px solid var(--gold-deep); outline-offset: 10px; }
 .hero-title {
   margin: 0;
   font-family: var(--font-sans);
@@ -336,7 +358,7 @@ h2 { font-size: 1.25rem; }
   text-shadow: 0 1px 18px color-mix(in srgb, var(--bg) 82%, transparent);
 }
 
-/* 下滑引导：指向第二屏「今日一句」。以前页面只有一屏所以删了，现在有第二屏就捡回来 */
+/* 下滑引导：指向第二屏「风中的纸屑」。以前页面只有一屏所以删了，现在有第二屏就捡回来 */
 .hero-cue {
   position: absolute;
   left: 50%;
@@ -375,7 +397,7 @@ h2 { font-size: 1.25rem; }
 }
 .hero .reveal { opacity: 0; animation: rise 1.05s var(--ease-out) both; }
 
-/* ---------------- 第二屏：今日一句（打字机） ----------------
+/* ---------------- 第二屏：风中的纸屑（打字机） ----------------
    接在全屏 hero 之后。因为 hero 底部有 hero-scrim 渐隐到 --bg，
    这一屏自然落到奶油底上，留白为主，让句子成为唯一的焦点。 */
 .quote-stage {

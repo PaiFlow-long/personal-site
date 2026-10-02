@@ -15,12 +15,21 @@ import { DEFAULT_LANG, t } from '../i18n/ui'
     <div class="hero-scrim" aria-hidden="true"></div>
 
     <div class="hero-inner">
-      <span class="hero-mark reveal" style="animation-delay:.1s"><LogoMark size={76} /></span>
+      <!-- 小派 logo 是可点的：按一下随机换一条「风中的纸屑」并滑到第二屏 -->
+      <button
+        class="hero-mark reveal"
+        type="button"
+        data-i18n-aria="ui.quote.next"
+        aria-label={t(DEFAULT_LANG, 'ui.quote.next')}
+        style="animation-delay:.1s"
+      >
+        <LogoMark size={76} />
+      </button>
       <h1 class="hero-title reveal" style="animation-delay:.42s">{SITE.statement.cn}</h1>
       <p class="hero-sub reveal" style="animation-delay:.7s">{SITE.statement.en}</p>
     </div>
 
-    <!-- 下滑引导：指向第二屏的「今日一句」（打字机）。Brand slogan 保持在 hero 不动。 -->
+    <!-- 下滑引导：指向第二屏「风中的纸屑」（打字机）。Brand slogan 保持在 hero 不动。 -->
     <a
       class="hero-cue reveal"
       href="#daily"
