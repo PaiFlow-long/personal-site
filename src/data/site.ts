@@ -11,8 +11,6 @@
 export const SITE = {
   brand: 'PaiFlow苹果派',
   brandEn: 'PaiFlow',
-  /** 品牌 slogan（源自 π：无限不循环） */
-  slogan: '无限不循环的小派',
   /** 页面底部的中英双语宣言 —— 中英同时呈现，不随语言切换 */
   statement: {
     cn: '跳出人生的循环',

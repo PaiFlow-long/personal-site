@@ -4,7 +4,6 @@ import { SITE, NAV } from '../data/site'
 import { UI, LANGUAGES, DEFAULT_LANG, t } from '../i18n/ui'
 import Header from '../components/Header.astro'
 import Footer from '../components/Footer.astro'
-import SloganBand from '../components/SloganBand.astro'
 
 interface Props {
   /** 直接指定页面名（用于文章详情页，传文章标题） */
@@ -18,7 +17,7 @@ interface Props {
 const {
   title,
   titleKey,
-  description = `${SITE.slogan} · ${SITE.brand}`,
+  description = `${SITE.statement.cn} · ${SITE.brand}`,
   bleed = false,
 } = Astro.props
 
@@ -161,7 +160,6 @@ const clientScript = `
     <main class={bleed ? 'bleed' : 'container'}>
       <slot />
     </main>
-    <SloganBand />
     <Footer />
   </body>
 </html>

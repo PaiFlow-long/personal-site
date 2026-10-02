@@ -27,7 +27,6 @@ const zhCN: Dict = {
   'nav.about': '关于',
   'nav.contact': '联系',
 
-  'brand.slogan': '无限不循环的小派',
 
   'ui.menu': '菜单',
   'ui.theme.toggle': '切换白天 / 夜间',
@@ -39,7 +38,6 @@ const zhCN: Dict = {
   'ui.projects.lead': '正在推进与已完成的项目，带状态与时间线。',
   'ui.videos.lead': '视频以外部平台嵌入的形式呈现，不在本站托管。',
   'ui.videos.empty': '还没有视频，之后会陆续放上来。',
-  'ui.about.lead': '无限不循环的小派。一个会思考的苹果派。',
 
   'ui.status.active': '进行中',
   'ui.status.paused': '暂停',
@@ -52,8 +50,6 @@ const zhCN: Dict = {
   'ui.contact.message': '留言',
   'ui.contact.submit': '提交留言',
   'ui.contact.note': '说明：正式版将通过 Cloudflare Worker 写入 D1，并邮件通知。',
-
-  'ui.footer.tagline': '无限不循环的小派',
 }
 
 const zhTW: Dict = {
@@ -64,7 +60,6 @@ const zhTW: Dict = {
   'nav.about': '關於',
   'nav.contact': '聯絡',
 
-  'brand.slogan': '無限不循環的小派',
 
   'ui.menu': '選單',
   'ui.theme.toggle': '切換白天 / 夜間',
@@ -76,7 +71,6 @@ const zhTW: Dict = {
   'ui.projects.lead': '正在推進與已完成的專案，附狀態與時間軸。',
   'ui.videos.lead': '影片以外部平台嵌入的形式呈現，不在本站託管。',
   'ui.videos.empty': '還沒有影片，之後會陸續放上來。',
-  'ui.about.lead': '無限不循環的小派。一個會思考的蘋果派。',
 
   'ui.status.active': '進行中',
   'ui.status.paused': '暫停',
@@ -89,8 +83,6 @@ const zhTW: Dict = {
   'ui.contact.message': '留言',
   'ui.contact.submit': '送出留言',
   'ui.contact.note': '說明：正式版將透過 Cloudflare Worker 寫入 D1，並以郵件通知。',
-
-  'ui.footer.tagline': '無限不循環的小派',
 }
 
 const en: Dict = {
@@ -101,7 +93,6 @@ const en: Dict = {
   'nav.about': 'About',
   'nav.contact': 'Contact',
 
-  'brand.slogan': 'Infinite & non-repeating',
 
   'ui.menu': 'Menu',
   'ui.theme.toggle': 'Toggle light / dark',
@@ -113,7 +104,6 @@ const en: Dict = {
   'ui.projects.lead': 'Ongoing and finished projects, with status and timeline.',
   'ui.videos.lead': 'Videos are embedded from external platforms, not hosted here.',
   'ui.videos.empty': 'No videos yet — more coming soon.',
-  'ui.about.lead': 'A little pie that thinks. Infinite and non-repeating.',
 
   'ui.status.active': 'Active',
   'ui.status.paused': 'Paused',
@@ -126,8 +116,6 @@ const en: Dict = {
   'ui.contact.message': 'Message',
   'ui.contact.submit': 'Send',
   'ui.contact.note': 'Note: the production version will write to Cloudflare D1 and notify by email.',
-
-  'ui.footer.tagline': 'Infinite & non-repeating',
 }
 
 export const UI: Record<Lang, Dict> = {
