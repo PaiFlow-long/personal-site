@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const articles = (await getCollection('articles')).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+---
+
+<BaseLayout title="文章" description="个人展示 / 文章">
+  <h1>文章 / 个人展示</h1>
+  <p class="lead">随笔、研究与思考。</p>
+  <div class="grid">
+    {
+      articles.map((a) => (
+        <a class="card" href={`/articles/${a.slug}`}>
+          <h3>{a.data.title}</h3>
+          <p class="meta">
+            {a.data.date.toLocaleDateString('zh-CN')}
+            {a.data.category ? ' · ' + a.data.category : ''}
+          </p>
+          {a.data.summary && <p>{a.data.summary}</p>}
+        </a>
+      ))
+    }
+  </div>
+</BaseLayout>

@@ -1,0 +1,17 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+
+const projects = (await getCollection('projects')).sort(
+  (a, b) => (b.data.start?.getTime() ?? 0) - (a.data.start?.getTime() ?? 0)
+);
+---
+
+<BaseLayout title="项目管理" description="项目管理：状态与时间线">
+  <h1>项目管理</h1>
+  <p class="lead">正在推进与已完成的项目，带状态与时间线（仿 OpenClue Thesis Tracker 思路）。</p>
+  <div class="grid">
+    {projects.map((p) => <ProjectCard project={p} />)}
+  </div>
+</BaseLayout>

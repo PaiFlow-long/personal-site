@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="联系 / 留言" description="联系与留言入口">
+  <h1>联系 / 留言</h1>
+  <p class="lead">
+    有合作、咨询或想说的话，填下面的表单。P0 阶段表单尚未接入后端，P3 会连接到数据库与邮件通知。
+  </p>
+  <form
+    class="contact"
+    onsubmit="event.preventDefault(); alert('P0 演示：后端尚未接入，将于 P3 完成。');"
+  >
+    <label>称呼<input name="name" required /></label>
+    <label>邮箱<input type="email" name="email" required /></label>
+    <label>留言<textarea name="message" rows="5" required></textarea></label>
+    <button type="submit">提交留言</button>
+  </form>
+  <div class="note">
+    说明：正式版将通过 Cloudflare Worker 写入 D1，并邮件通知你。
+  </div>
+</BaseLayout>

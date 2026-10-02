@@ -1,0 +1,56 @@
+---
+const { project } = Astro.props;
+const { title, status, summary, timeline, url } = project.data;
+const statusLabel: Record<string, string> = {
+  active: '进行中',
+  paused: '暂停',
+  done: '已完成',
+  planned: '计划中',
+};
+const external = Boolean(url);
+---
+
+{
+  external ? (
+    <a class="card project external" href={url} target="_blank" rel="noopener">
+      <div class="proj-head">
+        <h3>{title}</h3>
+        <span class="ext-badge">↗ 子站</span>
+      </div>
+      <span class={`tag status-${status}`}>{statusLabel[status]}</span>
+      {summary && <p>{summary}</p>}
+      {
+        timeline && timeline.length > 0 && (
+          <ol class="timeline">
+            {timeline.map((t: { date: Date; event: string }) => (
+              <li>
+                <span class="t-date">{t.date.toLocaleDateString('zh-CN')}</span>
+                <span class="t-event">{t.event}</span>
+              </li>
+            ))}
+          </ol>
+        )
+      }
+    </a>
+  ) : (
+    <article class="card project">
+      <div class="proj-head">
+        <h3>{title}</h3>
+        <span class={`tag status-${status}`}>{statusLabel[status]}</span>
+      </div>
+      {summary && <p>{summary}</p>}
+      {
+        timeline && timeline.length > 0 && (
+          <ol class="timeline">
+            {timeline.map((t: { date: Date; event: string }) => (
+              <li>
+                <span class="t-date">{t.date.toLocaleDateString('zh-CN')}</span>
+                <span class="t-event">{t.event}</span>
+              </li>
+            ))}
+          </ol>
+        )
+      }
+    </article>
+  )
+}

@@ -1,0 +1,68 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+
+const articles = (await getCollection('articles'))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 3);
+const projects = (await getCollection('projects'))
+  .sort((a, b) => (b.data.start?.getTime() ?? 0) - (a.data.start?.getTime() ?? 0));
+const insights = (await getCollection('insights'))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 3);
+---
+
+<BaseLayout>
+  <section class="hero">
+    <h1>你好，我是 pai</h1>
+    <p class="sub">个人主页 · 在这里记录我的思考、进行中的项目，以及对外发布的研究与动态。</p>
+    <!-- ⚠️ 占位自我介绍：替换为你自己的简介 -->
+    <p class="intro">
+      我是一名个人开发者，关注投资研究、效率工具与数据可视化。这个站点是我对外的小中枢——
+      左边是我的文字与动态，下面是我正在做、或已经做成的具体项目（含独立子站）。
+    </p>
+    <a class="cta" href="/about">了解更多关于我 →</a>
+  </section>
+
+  <div class="section-title"><h2>快速入口</h2></div>
+  <div class="grid">
+    <a class="card" href="/articles"><h3>文章 / 思考 →</h3><p>随笔、研究与复盘</p></a>
+    <a class="card" href="/projects"><h3>项目 →</h3><p>状态与时间线追踪</p></a>
+    <a class="card" href="/insights"><h3>资讯动态 →</h3><p>对外发布的信息</p></a>
+    <a class="card" href="/contact"><h3>联系 / 留言 →</h3><p>给我留言或预约咨询</p></a>
+  </div>
+
+  <div class="section-title"><h2>我的项目与子站</h2><a href="/projects">全部 →</a></div>
+  <p class="lead">带「↗ 子站」角标的卡片会跳转到独立的项目站点；其余为站内项目。</p>
+  <div class="grid">
+    {projects.map((p) => <ProjectCard project={p} />)}
+  </div>
+
+  <div class="section-title"><h2>最新文章</h2><a href="/articles">全部 →</a></div>
+  <div class="grid">
+    {
+      articles.map((a) => (
+        <a class="card" href={`/articles/${a.slug}`}>
+          <h3>{a.data.title}</h3>
+          <p class="meta">
+            {a.data.date.toLocaleDateString('zh-CN')}
+            {a.data.category ? ' · ' + a.data.category : ''}
+          </p>
+        </a>
+      ))
+    }
+  </div>
+
+  <div class="section-title"><h2>最新资讯</h2><a href="/insights">全部 →</a></div>
+  <div class="grid">
+    {
+      insights.map((i) => (
+        <a class="card" href="/insights">
+          <h3>{i.data.title}</h3>
+          <p class="meta">{i.data.date.toLocaleDateString('zh-CN')}</p>
+        </a>
+      ))
+    }
+  </div>
+</BaseLayout>

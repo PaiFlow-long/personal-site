@@ -1,0 +1,43 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const {
+  title = '个人站',
+  description = '个人展示 · 项目管理 · 消息咨询',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body>
+    <header class="site">
+      <div class="container">
+        <a class="brand" href="/">◈ pai</a>
+        <nav>
+          <a href="/articles">文章</a>
+          <a href="/projects">项目</a>
+          <a href="/insights">资讯</a>
+          <a href="/about">关于</a>
+          <a href="/contact">联系</a>
+        </nav>
+      </div>
+    </header>
+    <main class="container">
+      <slot />
+    </main>
+    <footer class="site">
+      <div class="container">© {new Date().getFullYear()} pai · 个人主页</div>
+    </footer>
+  </body>
+</html>
