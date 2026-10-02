@@ -336,12 +336,153 @@ h2 { font-size: 1.25rem; }
   text-shadow: 0 1px 18px color-mix(in srgb, var(--bg) 82%, transparent);
 }
 
+/* 下滑引导：指向第二屏「今日一句」。以前页面只有一屏所以删了，现在有第二屏就捡回来 */
+.hero-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.66rem;
+  letter-spacing: 0.32em;
+  text-indent: 0.32em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.3s var(--ease-out);
+}
+.hero-cue:hover { color: var(--fg); text-decoration: none; }
+.hero-cue::after {
+  content: '';
+  width: 1px;
+  height: 32px;
+  background: linear-gradient(to bottom, var(--muted), transparent);
+  animation: cueDrop 2.2s ease-in-out infinite;
+}
+@keyframes cueDrop {
+  0%, 100% { transform: scaleY(0.25); transform-origin: top; opacity: 0.35; }
+  50% { transform: scaleY(1); transform-origin: top; opacity: 1; }
+}
+
 /* 入场：大字逐段浮现（错峰节奏由各元素内联 animation-delay 控制） */
 @keyframes rise {
   from { opacity: 0; transform: translateY(24px); filter: blur(7px); }
   to { opacity: 1; transform: none; filter: blur(0); }
 }
 .hero .reveal { opacity: 0; animation: rise 1.05s var(--ease-out) both; }
+
+/* ---------------- 第二屏：今日一句（打字机） ----------------
+   接在全屏 hero 之后。因为 hero 底部有 hero-scrim 渐隐到 --bg，
+   这一屏自然落到奶油底上，留白为主，让句子成为唯一的焦点。 */
+.quote-stage {
+  position: relative;
+  padding: clamp(78px, 13vh, 140px) 24px clamp(88px, 14vh, 160px);
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+.qs-inner {
+  /* 够宽：让二十四五字以内的句子尽量一行放下，不折成两行 */
+  max-width: 880px;
+  display: grid;
+  gap: 26px;
+  justify-items: center;
+}
+.qs-label {
+  margin: 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.34em;
+  text-indent: 0.34em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.qs-text {
+  margin: 0;
+  position: relative;
+  /* 宽度 = 完整文本的宽度（由幽灵层撑出），短句收缩、长句到 100% 换行 */
+  width: fit-content;
+  max-width: 100%;
+  /* 必须左对齐：容器已被幽灵层定宽，左对齐时逐字从左往右推进；
+     若继承外层的居中，文字会从中间往两边长，不像打字机。
+     单行时左对齐与居中的最终落点完全一致，所以完成态看不出差别。 */
+  text-align: left;
+  /* 与页脚签名同一血脉：整站中文母语题款用楷体 */
+  font-family: 'Kaiti SC', KaiTi, STKaiti, 'Songti SC', SimSun, serif;
+  font-size: clamp(1.4rem, 3.9vw, 2.05rem);
+  line-height: 1.78;
+  letter-spacing: 0.05em;
+  color: color-mix(in srgb, var(--fg) 88%, var(--muted));
+}
+/* 按句子长度自动分档：短句当大字横幅，长句降级当段落排。
+   数据是 pai 一行一句贴进去的，长度不可控，所以交给组件按字数切档，
+   而不是让他去记「一句不能超过 25 字」这种规则。 */
+.quote-stage[data-len='m'] .qs-text {
+  font-size: clamp(1.2rem, 3.1vw, 1.62rem);
+  line-height: 1.86;
+  max-width: 760px;
+}
+.quote-stage[data-len='l'] .qs-text {
+  font-size: clamp(1.02rem, 2.35vw, 1.24rem);
+  line-height: 1.95;
+  letter-spacing: 0.03em;
+  max-width: 680px;
+}
+/* 纯西文句换展示字体：楷体没有西文字形，硬套会掉进很难看的系统回退 */
+.quote-stage[data-lang='en'] .qs-text {
+  font-family: var(--font-display);
+  font-style: normal;
+  letter-spacing: 0.01em;
+}
+/* 幽灵层承担占位，live 层叠在同一坐标系里逐字输出。
+   两层的行高与起点一致，所以每个字落在与完成态完全相同的位置。
+   这里刻意不加 text-wrap: balance —— 它会让"已打出的部分"算出与
+   完整文本不同的断行点，打字过程中就会跳行。 */
+.qs-ghost { visibility: hidden; }
+.qs-live { position: absolute; inset: 0; }
+/* 无 JS 时：显示幽灵层里的静态句子，隐藏空的打字层 */
+html:not(.js) .qs-ghost { visibility: visible; }
+html:not(.js) .qs-live { display: none; }
+.qs-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  margin-left: 0.16em;
+  background: var(--accent);
+  vertical-align: -0.16em;
+  animation: caretBlink 1.05s steps(1) infinite;
+}
+@keyframes caretBlink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+/* 打完字光标收走，出处淡入 —— 两件事一起做出「说完了」的收尾感 */
+.quote-stage.typing-done .qs-caret { animation: none; opacity: 0; transition: opacity 0.7s ease 0.35s; }
+.qs-src {
+  margin: 0;
+  font-size: 0.86rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 0.9s var(--ease-out) 0.5s;
+}
+.quote-stage.typing-done .qs-src { opacity: 1; }
+
+/* 屏幕阅读器专用：打字是视觉效果，读屏直接拿到完整句子 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* ---------------- 卡片 / 列表 ---------------- */
 .grid {
@@ -499,6 +640,10 @@ html.js .reveal-on-scroll.in { opacity: 1; transform: none; }
   .brand-mark,
   .wm-rule,
   .wm-cn { transition: none; }
+  /* 打字效果已由脚本直接显示全文，这里补上光标的静态收尾 */
+  .hero-cue::after { animation: none; opacity: 0.6; }
+  .qs-caret { animation: none; opacity: 0; }
+  .qs-src { transition: none; opacity: 1; }
 }
 
 /* ---------------- 表单 / 正文 ---------------- */

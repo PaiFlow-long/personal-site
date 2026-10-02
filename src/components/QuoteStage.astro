@@ -1,0 +1,126 @@
+---
+/**
+ * 今日一句 · 第二屏
+ *
+ * 内容来自 src/data/quotes.md（加句子改那个文件即可，这里不用动）。
+ * 按「日期序号」抽一条 —— 同一天无论刷新几次都是同一句，隔天自动换，
+ * 且因为是顺序取模，连续两天不会撞到同一句。
+ * 纯前端运行，不需要后端或第三方接口，也就不存在「抓取失败」的空窗。
+ *
+ * 打字机在区块滚进视口时才开始，避免用户滑下来时字早打完了。
+ * 系统开了「减少动效」则直接显示全文（无障碍）。
+ */
+import { QUOTES, FALLBACK, isLatin } from '../data/quotes'
+import { DEFAULT_LANG, t } from '../i18n/ui'
+
+const pool = QUOTES.length ? QUOTES : [FALLBACK]
+const first = pool[0]
+---
+
+<section class="quote-stage" id="daily" data-quotes={JSON.stringify(pool)}>
+  <div class="qs-inner reveal-on-scroll">
+    <p class="qs-label" data-i18n="ui.quote.label">{t(DEFAULT_LANG, 'ui.quote.label')}</p>
+    <blockquote class="qs-text">
+      <!-- 幽灵层：完整文本但不可见，用它先把最终宽度与行数撑住，
+           打字时文字才会从左侧起点往右推进，而不是从中心往两边长。
+           无 JS 时它转为可见，作为降级显示。 -->
+      <span class="qs-ghost" data-tw-ghost>{first.text}</span>
+      <span class="sr-only" data-tw-full>{first.text}</span>
+      <span class="qs-live" aria-hidden="true"
+        ><span data-tw-text></span><span class="qs-caret"></span
+      ></span>
+    </blockquote>
+    <p class="qs-src"><span data-tw-src>{first.author ? '— ' + first.author : ''}</span></p>
+  </div>
+</section>
+
+<script>
+  ;(function () {
+    var stage = document.querySelector('[data-quotes]')
+    if (!stage) return
+
+    var pool: any[]
+    try {
+      pool = JSON.parse(stage.getAttribute('data-quotes') || '[]')
+    } catch (e) {
+      pool = []
+    }
+    if (!pool.length) return
+
+    /* ---- 每日一句：同一天恒定，隔天顺序前进 ----
+       用「今天是第几天」取模，而不是对日期做哈希 —— 取模能保证
+       连续两天一定不是同一句（哈希会有 1/N 的概率撞车）。
+       想改成「每次刷新都随机」，把 dayIndex() 换成 Math.random() 即可。 */
+    function dayIndex() {
+      var d = new Date()
+      return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000)
+    }
+    /* 调试用：网址加 ?q=12 就能直接看到第 12 条（编号＝quotes.md 里的序号）。
+       正常访问不带参数，仍按日期自动抽。 */
+    var forced = -1
+    try {
+      forced = parseInt(new URLSearchParams(location.search).get('q') || '-1', 10)
+    } catch (e) {}
+    var auto = ((dayIndex() % pool.length) + pool.length) % pool.length
+    var q = forced >= 1 && forced <= pool.length ? pool[forced - 1] : pool[auto]
+
+    var textEl = stage.querySelector('[data-tw-text]')
+    var ghostEl = stage.querySelector('[data-tw-ghost]')
+    var fullEl = stage.querySelector('[data-tw-full]')
+    var srcEl = stage.querySelector('[data-tw-src]')
+
+    /* 长度分档：短句撑大字号独占一行，长句降字号当段落排（CSS 里按 data-len 切换） */
+    var chars = Array.from(q.text || '')
+    var len = chars.length
+    stage.setAttribute('data-len', len <= 25 ? 's' : len <= 60 ? 'm' : 'l')
+    /* 西文句换无衬线/展示字体 —— 楷体没有西文字形，硬套会退化成很难看的系统回退 */
+    var cjk = (q.text.match(/[\u4e00-\u9fff\u3000-\u303f\uff00-\uffef]/g) || []).length
+    if (cjk / Math.max(len, 1) < 0.25) stage.setAttribute('data-lang', 'en')
+
+    if (textEl) textEl.textContent = ''
+    if (ghostEl) ghostEl.textContent = q.text
+    if (fullEl) fullEl.textContent = q.text
+    if (srcEl) srcEl.textContent = q.author ? '— ' + q.author : ''
+
+    function showAll() {
+      if (textEl) textEl.textContent = q.text
+      stage.classList.add('typing-done')
+    }
+
+    var reduce =
+      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduce || typeof IntersectionObserver === 'undefined') {
+      showAll()
+      return
+    }
+
+    /* 逐字输出，间隔带随机抖动 —— 匀速会像机器，抖动才像人在打。
+       长句要打快些，否则百字一句能让人等上十秒。 */
+    var base = len <= 25 ? 78 : len <= 60 ? 46 : 26
+    function type() {
+      var i = 0
+      ;(function step() {
+        if (!textEl) return
+        if (i >= len) {
+          stage.classList.add('typing-done')
+          return
+        }
+        textEl.textContent += chars[i++]
+        setTimeout(step, base + Math.random() * base * 0.6)
+      })()
+    }
+
+    var io = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) {
+            io.unobserve(en.target)
+            setTimeout(type, 320)
+          }
+        })
+      },
+      { threshold: 0.45 }
+    )
+    io.observe(stage)
+  })()
+</script>

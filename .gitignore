@@ -25,3 +25,7 @@ Thumbs.db
 
 # local project memory (not for deploy)
 .workbuddy/
+
+# 临时暂存（探针页等），不进仓库
+.trash/
+.shots/

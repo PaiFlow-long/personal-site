@@ -1,7 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro'
 import LogoMark from '../components/LogoMark.astro'
+import QuoteStage from '../components/QuoteStage.astro'
 import { SITE } from '../data/site'
+import { DEFAULT_LANG, t } from '../i18n/ui'
 ---
 
 <BaseLayout bleed>
@@ -18,6 +20,18 @@ import { SITE } from '../data/site'
       <p class="hero-sub reveal" style="animation-delay:.7s">{SITE.statement.en}</p>
     </div>
 
-    <!-- 预留位：后期交互（视差 / 滚动引导 / 鼠标跟随）加在这里。 -->
+    <!-- 下滑引导：指向第二屏的「今日一句」（打字机）。Brand slogan 保持在 hero 不动。 -->
+    <a
+      class="hero-cue reveal"
+      href="#daily"
+      data-i18n="ui.quote.scroll"
+      style="animation-delay:1.15s"
+    >
+      {t(DEFAULT_LANG, 'ui.quote.scroll')}
+    </a>
+
+    <!-- 预留位：后期交互（视差 / 鼠标跟随）加在这里。 -->
   </section>
+
+  <QuoteStage />
 </BaseLayout>
