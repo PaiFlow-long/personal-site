@@ -39,7 +39,7 @@ const items = await Promise.all(
           aria-label={it.caption}
         >
           <img src={it.thumbUrl} alt={it.caption} loading="lazy" decoding="async" />
-          <span class="g-cap">{it.caption}</span>
+          <span class="g-cap">《{it.caption}》</span>
         </button>
       ))
     }
@@ -62,20 +62,39 @@ const items = await Promise.all(
     let visible = items
     let current = 0
 
+    let typeTimer = 0
+    // 配文以打字机样式逐字出现；换图/关闭时打断旧的，避免串字
+    function typeNote(text: string) {
+      clearTimeout(typeTimer)
+      lbNote.textContent = ''
+      if (!text) { lbNote.hidden = true; return }
+      lbNote.hidden = false
+      const caret = document.createElement('span')
+      caret.className = 'lb-caret'
+      lbNote.appendChild(caret)
+      let i = 0
+      const step = () => {
+        if (i >= text.length) { caret.remove(); return }
+        const ch = text[i++]
+        caret.insertAdjacentText('beforebegin', ch)
+        const delay = /[，。！？、；：…—）(]/.test(ch) ? 280 : 42
+        typeTimer = setTimeout(step, delay)
+      }
+      step()
+    }
     function open(i: number) {
       const el = visible[i]
       if (!el) return
       lbImg.src = el.dataset.full || ''
       lbImg.alt = el.dataset.caption || ''
-      lbCap.textContent = el.dataset.caption || ''
-      const note = el.dataset.note || ''
-      lbNote.textContent = note
-      lbNote.hidden = note === ''
+      lbCap.textContent = '《' + (el.dataset.caption || '') + '》'
+      typeNote(el.dataset.note || '')
       lb.hidden = false
       document.body.style.overflow = 'hidden'
       current = i
     }
     function close() {
+      clearTimeout(typeTimer)
       lb.hidden = true
       document.body.style.overflow = ''
     }

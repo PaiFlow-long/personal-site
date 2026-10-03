@@ -829,7 +829,18 @@ article.prose img { max-width: 100%; border-radius: 10px; }
   font-style: italic;
   font-size: clamp(1rem, 2.4vw, 1.3rem);
   color: color-mix(in srgb, #fff 82%, var(--gold));
+  text-align: left;
 }
+.lb-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.05em;
+  vertical-align: -0.18em;
+  margin-left: 1px;
+  background: var(--apple-red);
+  animation: lbBlink 1s steps(1, end) infinite;
+}
+@keyframes lbBlink { 50% { opacity: 0; } }
 .lb-img {
   max-width: min(92vw, 1200px);
   max-height: 64vh;
