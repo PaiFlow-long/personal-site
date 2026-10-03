@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro'
 import LogoMark from '../components/LogoMark.astro'
 import QuoteStage from '../components/QuoteStage.astro'
+import type { ImageMetadata } from 'astro'
 import { SITE } from '../data/site'
 import { DEFAULT_LANG, t } from '../i18n/ui'
 
@@ -13,11 +14,13 @@ import { DEFAULT_LANG, t } from '../i18n/ui'
  * 实际「今天用哪张」由底部 is:inline 脚本按本地日期取模决定（同一天恒定、隔天换，
  * 和「风中的纸屑」同一套确定性逻辑，避免每次刷新都跳一张）。
  */
-const heroModules = import.meta.glob('../assets/heroes/*.{jpg,jpeg,png,webp,avif,gif}', {
-  eager: true,
-  import: 'default',
-})
-const heroPool: string[] = Object.values(heroModules) as string[]
+const heroModules = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/heroes/*.{jpg,jpeg,png,webp,avif,gif}',
+  { eager: true }
+)
+// 取每张图构建后的真实 URL（import 得到的是 ImageMetadata 对象，必须取 .src，
+// 否则拼进 url(...) 会变成 url("[object Object]")，背景不显示、只剩兜底纯色）
+const heroPool: string[] = Object.values(heroModules).map((m) => m.default.src)
 ---
 
 <BaseLayout bleed>

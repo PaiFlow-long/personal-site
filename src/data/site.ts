@@ -29,9 +29,9 @@ export interface NavItem {
 export const NAV: NavItem[] = [
   { key: 'home', path: '/' },
   { key: 'articles', path: '/articles' },
+  { key: 'gallery', path: '/gallery' },
   { key: 'videos', path: '/videos' },
   { key: 'projects', path: '/projects' },
   { key: 'about', path: '/about' },
   { key: 'contact', path: '/contact' },
-  { key: 'gallery', path: '/gallery' },
 ]
