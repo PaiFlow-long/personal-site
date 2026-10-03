@@ -256,16 +256,17 @@ h2 { font-size: 1.25rem; }
   isolation: isolate;
 }
 
-/* 大视觉层：默认是品牌色的「晨光」氛围。
-   想换成一整张真照片，给 .hero 加内联 style="--hero-image:url('/hero.jpg')" 即可。 */
+/* 大视觉层：默认是品牌色的「晨光」氛围 + 一张真照片 hero.png。
+   每日轮换由 index.astro 底部的 is:inline 脚本按日期把 --hero-image 改写；
+   想固定某张：给 .hero 加内联 style="--hero-image:url('/xxx.jpg')" 即可覆盖脚本。 */
 .hero-visual {
   position: absolute;
   inset: 0;
   z-index: 0;
   background-color: color-mix(in srgb, var(--gold) 12%, var(--bg));
-  /* 换大图：替换 public/hero.png 即可；
-     想用别的图，给 .hero 传内联 style="--hero-image:url('/xxx.jpg')" */
-  background-image: var(--hero-image, url('/hero.png'));
+  /* 换大图：把照片丢进 src/assets/heroes/（每日轮换池）即可；原 public/hero.png 已隐藏不再使用。
+     想用别的固定图，给 .hero 传内联 style="--hero-image:url('/xxx.jpg')" */
+  background-image: var(--hero-image, linear-gradient(135deg, color-mix(in srgb, var(--gold) 26%, var(--bg)), color-mix(in srgb, var(--apple-red) 12%, var(--bg))));
   background-size: cover;
   background-position: center 42%;
 }
@@ -740,3 +741,122 @@ article.prose img { max-width: 100%; border-radius: 10px; }
   .wordmark { gap: 8px; }
   .hero-inner { gap: 13px; }
 }
+
+/* ---------------- 图库 gallery ---------------- */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 26px;
+}
+.g-item {
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: var(--accent-soft);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  aspect-ratio: 4 / 3;
+  transition: transform 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out);
+}
+.g-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s var(--ease-out);
+}
+.g-item:hover { transform: translateY(-3px); box-shadow: 0 16px 34px rgba(0, 0, 0, 0.12); }
+.g-item:hover img { transform: scale(1.05); }
+.g-cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 22px 12px 10px;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent);
+  pointer-events: none;
+}
+.album-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 22px;
+}
+.album-tab {
+  padding: 7px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.86rem;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-out);
+}
+.album-tab:hover { color: var(--fg); border-color: var(--gold); }
+.album-tab.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* 灯箱：上边留白给你写话 / 中间图 / 下边名字 */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 64px 20px 40px;
+  background: rgba(18, 14, 10, 0.94);
+  backdrop-filter: blur(4px);
+}
+.lightbox[hidden] { display: none; }
+.lb-note {
+  margin: 0;
+  max-width: 640px;
+  min-height: 1.2em;
+  text-align: center;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1rem, 2.4vw, 1.3rem);
+  color: color-mix(in srgb, #fff 82%, var(--gold));
+}
+.lb-img {
+  max-width: min(92vw, 1200px);
+  max-height: 64vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+.lb-cap {
+  margin: 0;
+  font-size: 0.92rem;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.82);
+}
+.lb-close {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.25s;
+}
+.lb-close:hover { background: rgba(255, 255, 255, 0.24); }
+

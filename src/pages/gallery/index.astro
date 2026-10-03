@@ -1,0 +1,111 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro'
+import { getImage } from 'astro:assets'
+import { DEFAULT_LANG, t } from '../../i18n/ui'
+import { photos, albums } from '../../data/gallery'
+
+// 预生成两种尺寸：网格缩略图 + 灯箱大图（Astro 自动转 webp，避免原图动辄二三十 MB）
+const items = await Promise.all(
+  photos.map(async (p) => {
+    const thumb = await getImage({ src: p.src, width: 640, formats: ['webp'] })
+    const full = await getImage({ src: p.src, width: 1600, formats: ['webp'] })
+    return { ...p, thumbUrl: thumb.src, fullUrl: full.src }
+  })
+)
+---
+<BaseLayout titleKey="gallery" description="PaiFlow苹果派 · 图库">
+  <h1 data-i18n="nav.gallery">{t(DEFAULT_LANG, 'nav.gallery')}</h1>
+  <p class="lead">按下快门，是为那些不肯消失的瞬间留一条退路。</p>
+
+  <div class="album-tabs" role="tablist" aria-label="相册">
+    <button class="album-tab is-active" type="button" data-album="all">{t(DEFAULT_LANG, 'ui.all')}</button>
+    {
+      albums.map((a) => (
+        <button class="album-tab" type="button" data-album={a}>{a}</button>
+      ))
+    }
+  </div>
+
+  <div class="gallery-grid">
+    {
+      items.map((it) => (
+        <button
+          class="g-item"
+          type="button"
+          data-full={it.fullUrl}
+          data-caption={it.caption}
+          data-note={it.note}
+          data-album={it.album}
+          aria-label={it.caption}
+        >
+          <img src={it.thumbUrl} alt={it.caption} loading="lazy" decoding="async" />
+          <span class="g-cap">{it.caption}</span>
+        </button>
+      ))
+    }
+  </div>
+
+  <!-- 灯箱：上边留白给你写话（note，暂空），中间图，下边名字 -->
+  <div class="lightbox" data-lb hidden>
+    <button class="lb-close" type="button" data-lb-close aria-label="关闭">×</button>
+    <p class="lb-note" data-lb-note></p>
+    <img class="lb-img" data-lb-img alt="" />
+    <p class="lb-cap" data-lb-cap></p>
+  </div>
+
+  <script>
+    const items = Array.from(document.querySelectorAll<HTMLButtonElement>('.g-item'))
+    const lb = document.querySelector<HTMLElement>('[data-lb]')!
+    const lbImg = lb.querySelector<HTMLImageElement>('[data-lb-img]')!
+    const lbCap = lb.querySelector<HTMLElement>('[data-lb-cap]')!
+    const lbNote = lb.querySelector<HTMLElement>('[data-lb-note]')!
+    let visible = items
+    let current = 0
+
+    function open(i: number) {
+      const el = visible[i]
+      if (!el) return
+      lbImg.src = el.dataset.full || ''
+      lbImg.alt = el.dataset.caption || ''
+      lbCap.textContent = el.dataset.caption || ''
+      const note = el.dataset.note || ''
+      lbNote.textContent = note
+      lbNote.hidden = note === ''
+      lb.hidden = false
+      document.body.style.overflow = 'hidden'
+      current = i
+    }
+    function close() {
+      lb.hidden = true
+      document.body.style.overflow = ''
+    }
+
+    items.forEach((el) => el.addEventListener('click', () => open(visible.indexOf(el))))
+
+    lb.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement
+      if (target === lb || target.hasAttribute('data-lb-close')) close()
+    })
+    document.addEventListener('keydown', (e) => {
+      if (lb.hidden) return
+      if (e.key === 'Escape') close()
+      else if (e.key === 'ArrowRight') open((current + 1) % visible.length)
+      else if (e.key === 'ArrowLeft') open((current - 1 + visible.length) % visible.length)
+    })
+
+    document.querySelectorAll<HTMLButtonElement>('.album-tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.album-tab').forEach((b) => b.classList.remove('is-active'))
+        tab.classList.add('is-active')
+        const a = tab.dataset.album
+        items.forEach((el) => {
+          el.style.display = a === 'all' || el.dataset.album === a ? '' : 'none'
+        })
+        visible = items.filter((el) => a === 'all' || el.dataset.album === a)
+      })
+    })
+
+    // 预览模式：访问 /gallery/?preview=1 自动打开第一张（便于截图/演示，不影响正常访问）
+    if (location.search.includes('preview')) open(0)
+  </script>
+</BaseLayout>

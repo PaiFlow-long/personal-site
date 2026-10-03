@@ -29,3 +29,6 @@ Thumbs.db
 # 临时暂存（探针页等），不进仓库
 .trash/
 .shots/
+
+# 本地截图预览
+preview/

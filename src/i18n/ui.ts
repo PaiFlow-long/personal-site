@@ -26,6 +26,7 @@ const zhCN: Dict = {
   'nav.projects': '项目',
   'nav.about': '关于',
   'nav.contact': '联系',
+  'nav.gallery': '图库',
 
 
   'ui.menu': '菜单',
@@ -63,6 +64,7 @@ const zhTW: Dict = {
   'nav.projects': '專案',
   'nav.about': '關於',
   'nav.contact': '聯絡',
+  'nav.gallery': '圖庫',
 
 
   'ui.menu': '選單',
@@ -100,6 +102,7 @@ const en: Dict = {
   'nav.projects': 'Projects',
   'nav.about': 'About',
   'nav.contact': 'Contact',
+  'nav.gallery': 'Gallery',
 
 
   'ui.menu': 'Menu',

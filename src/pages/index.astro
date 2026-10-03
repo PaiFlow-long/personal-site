@@ -4,13 +4,27 @@ import LogoMark from '../components/LogoMark.astro'
 import QuoteStage from '../components/QuoteStage.astro'
 import { SITE } from '../data/site'
 import { DEFAULT_LANG, t } from '../i18n/ui'
+
+/**
+ * 首页大图每日轮换：
+ * 池子 = 仅 src/assets/heroes/ 里所有照片（Vite 自动优化、自动发现）。
+ * 原 public/hero.png 已永久隐藏，不再参与轮换（pai 要求）。
+ * pai 想加图：把照片丢进 src/assets/heroes/ 重新部署即可，不用碰代码。
+ * 实际「今天用哪张」由底部 is:inline 脚本按本地日期取模决定（同一天恒定、隔天换，
+ * 和「风中的纸屑」同一套确定性逻辑，避免每次刷新都跳一张）。
+ */
+const heroModules = import.meta.glob('../assets/heroes/*.{jpg,jpeg,png,webp,avif,gif}', {
+  eager: true,
+  import: 'default',
+})
+const heroPool: string[] = Object.values(heroModules) as string[]
 ---
 
 <BaseLayout bleed>
   <section class="hero">
-    <!-- 全屏大视觉：默认加载 public/hero.png（暖调苹果园晨光，中心留白给大字）。
-         换图：直接替换 public/hero.png；或用别的图时给本 section 加
-         style="--hero-image:url('/other.jpg')" -->
+    <!-- 全屏大视觉：默认 public/hero.png（暖调苹果园晨光，中心留白给大字）。
+         想固定某张：给 .hero 加 style="--hero-image:url('/xxx.jpg')" 会盖过脚本的每日轮换；
+         想每天换：把照片丢进 src/assets/heroes/ 即可。 -->
     <div class="hero-visual" aria-hidden="true"></div>
     <div class="hero-scrim" aria-hidden="true"></div>
 
@@ -44,3 +58,20 @@ import { DEFAULT_LANG, t } from '../i18n/ui'
 
   <QuoteStage />
 </BaseLayout>
+
+<!-- 每日轮换大图：按本地日期取模挑一张写进 --hero-image。
+     放在文末但仍是 is:inline（解析到 .hero-visual 时它已存在于 DOM），几乎无闪烁。
+     想临时固定某张，把上面的 style="--hero-image:..." 加上即可覆盖本脚本。 -->
+<script is:inline define:vars={{ heroPool }}>
+  (function () {
+    if (!heroPool || heroPool.length === 0) return
+    var el = document.querySelector('.hero-visual')
+    if (!el) return
+    var d = new Date()
+    var day = Math.floor(
+      (Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(1970, 0, 1)) / 86400000
+    )
+    var url = heroPool[((day % heroPool.length) + heroPool.length) % heroPool.length]
+    el.style.setProperty('--hero-image', 'url("' + url + '")')
+  })()
+</script>

@@ -33,4 +33,5 @@ export const NAV: NavItem[] = [
   { key: 'projects', path: '/projects' },
   { key: 'about', path: '/about' },
   { key: 'contact', path: '/contact' },
+  { key: 'gallery', path: '/gallery' },
 ]
