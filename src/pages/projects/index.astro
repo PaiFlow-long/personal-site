@@ -12,7 +12,7 @@ const projects = (await getCollection('projects')).sort(
 <BaseLayout titleKey="projects" description="PaiFlow苹果派 · 项目">
   <h1 data-i18n="nav.projects">{t(DEFAULT_LANG, 'nav.projects')}</h1>
   <p class="lead" data-i18n="ui.projects.lead">{t(DEFAULT_LANG, 'ui.projects.lead')}</p>
-  <div class="grid">
+  <div class="grid projects">
     {projects.map((p) => <ProjectCard project={p} />)}
   </div>
 </BaseLayout>

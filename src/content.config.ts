@@ -17,7 +17,17 @@ const projects = defineCollection({
     status: z.enum(['active', 'paused', 'done', 'planned']),
     summary: z.string().optional(),
     start: z.date().optional(),
+    /** 结束时间；进行中的项目留空，卡片右上角只显示「起 → 至今」 */
+    end: z.date().optional(),
     url: z.string().optional(),
+    /** 子站 logo（放 public/ 下，写 /xxx.png 这种绝对路径） */
+    logo: z.string().optional(),
+    /** 技术栈标签 */
+    tech: z.array(z.string()).optional(),
+    /** 卡片底部链接行；label 必填，href 必填 */
+    links: z
+      .array(z.object({ label: z.string(), href: z.string() }))
+      .optional(),
     timeline: z
       .array(z.object({ date: z.date(), event: z.string() }))
       .optional(),

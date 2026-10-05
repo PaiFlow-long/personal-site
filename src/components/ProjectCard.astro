@@ -1,29 +1,83 @@
 ---
+/**
+ * 项目卡。
+ *
+ * 两种形态：
+ *  1) 「大卡」—— 设了 logo 的项目走这条（目前只有 OpenStock）。
+ *     通栏横排：左 logo，右内容；卡内自成一派的深色 + 青色主题，
+ *     视觉上向子站本体靠拢，等于一个「子站入口」。
+ *  2) 「小卡」—— 没 logo 的项目走原来的紧凑竖卡，保持主站奶油风。
+ *
+ * 加新项目时：想要大卡就补 logo: /xxx.png，其余字段随意。
+ */
 const { project } = Astro.props;
-const { title, status, summary, timeline, url } = project.data;
+const { title, status, summary, timeline, url, logo, tech, links, start, end } =
+  project.data;
+
 const statusLabel: Record<string, string> = {
   active: '进行中',
   paused: '暂停',
   done: '已完成',
   planned: '计划中',
 };
-const external = Boolean(url);
+
+/** 时间区间，形如 2026.09 – 至今 */
+function fmt(d: Date) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  return `${y}.${m}`;
+}
+const range = start ? `${fmt(start)} – ${end ? fmt(end) : '至今'}` : null;
+
+const clickable = Boolean(url) && !logo;
 ---
 
 {
-  external ? (
-    <a class="card project external" href={url} target="_blank" rel="noopener">
-      <div class="proj-head">
-        <h3>{title}</h3>
-        <span class="ext-badge">↗ 子站</span>
+  logo ? (
+    <article class="proj-hero">
+      <div class="ph-top">
+        <div class="ph-brand">
+          <img src={logo} alt={`${title} logo`} width="72" height="72" loading="lazy" />
+          <h3>
+            OPEN <span>STOCK</span>
+          </h3>
+        </div>
+        {range && <div class="ph-range">{range}</div>}
       </div>
-      <span class={`tag status-${status}`} data-i18n={`ui.status.${status}`}>
-        {statusLabel[status]}
-      </span>
-      {summary && <p>{summary}</p>}
+
+      <span class="ph-badge">↗ 子站</span>
+
+      {summary && <p class="ph-summary">{summary}</p>}
+
+      {
+        tech && tech.length > 0 && (
+          <ul class="ph-tech">
+            {tech.map((t: string) => (
+              <li>{t}</li>
+            ))}
+          </ul>
+        )
+      }
+
+      {
+        (links && links.length > 0) || url ? (
+          <div class="ph-links">
+            {(links && links.length > 0
+              ? links
+              : [{ label: '访问站点', href: url }]
+            ).map((l: { label: string; href: string }) => (
+              <a href={l.href} target="_blank" rel="noopener">
+                {l.label}
+                <span aria-hidden="true">↗</span>
+              </a>
+            ))}
+          </div>
+        ) : null
+      }
+
       {
         timeline && timeline.length > 0 && (
-          <ol class="timeline">
+          <ol class="ph-timeline">
             {timeline.map((t: { date: Date; event: string }) => (
               <li>
                 <span class="t-date">{t.date.toLocaleDateString('zh-CN')}</span>
@@ -33,6 +87,17 @@ const external = Boolean(url);
           </ol>
         )
       }
+    </article>
+  ) : clickable ? (
+    <a class="card project external" href={url} target="_blank" rel="noopener">
+      <div class="proj-head">
+        <h3>{title}</h3>
+        <span class="ext-badge">↗ 子站</span>
+      </div>
+      <span class={`tag status-${status}`} data-i18n={`ui.status.${status}`}>
+        {statusLabel[status]}
+      </span>
+      {summary && <p>{summary}</p>}
     </a>
   ) : (
     <article class="card project">
@@ -43,18 +108,6 @@ const external = Boolean(url);
         </span>
       </div>
       {summary && <p>{summary}</p>}
-      {
-        timeline && timeline.length > 0 && (
-          <ol class="timeline">
-            {timeline.map((t: { date: Date; event: string }) => (
-              <li>
-                <span class="t-date">{t.date.toLocaleDateString('zh-CN')}</span>
-                <span class="t-event">{t.event}</span>
-              </li>
-            ))}
-          </ol>
-        )
-      }
     </article>
   )
 }

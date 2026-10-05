@@ -563,6 +563,9 @@ html:not(.js) .qs-live { display: none; }
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   margin-top: 16px;
 }
+/* 项目页：大卡通栏，小卡才走多列网格 */
+.grid.projects > .proj-hero { grid-column: 1 / -1; }
+.grid.projects:has(> .proj-hero) { grid-template-columns: 1fr; }
 .card {
   display: block;
   padding: 18px;
@@ -635,6 +638,151 @@ html:not(.js) .qs-live { display: none; }
   white-space: nowrap;
 }
 .card.project.external { border-color: color-mix(in srgb, var(--gold) 45%, var(--border)); }
+
+/* ---------------- 项目 · 大卡（子站入口） ----------------
+   卡内自成一派的深色 + 青色主题，向子站本体（OpenStock）靠拢。
+   全部变量与规则都用 .proj-hero 作用域，不影响主站其余部分。 */
+.proj-hero {
+  --ph-bg: #0a0e18;
+  --ph-bg2: #111827;
+  --ph-line: #1e293b;
+  --ph-txt: #e2e8f0;
+  --ph-dim: #94a3b8;
+  --ph-cyan: #22d3ee;
+  --ph-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  position: relative;
+  overflow: hidden;
+  /* 不收满整栏：太宽会显得空，留出一点呼吸感 */
+  max-width: 760px;
+  /* 窄屏下别被网格/内容顶出去 */
+  width: 100%;
+  min-width: 0;
+  padding: 28px 30px 24px;
+  border-radius: 18px;
+  border: 1px solid var(--ph-line);
+  background: var(--ph-bg);
+  color: var(--ph-txt);
+  /* 子站同款 44px 网格暗纹 */
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.045) 1px, transparent 1px);
+  background-size: 44px 44px, 44px 44px;
+  box-shadow: 0 14px 40px rgba(10, 14, 24, 0.28);
+}
+/* 左上角一圈青色光晕，压住网格的冷感 */
+.proj-hero::before {
+  content: '';
+  position: absolute;
+  inset: -40% 40% 40% -20%;
+  background: radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.12), transparent 62%);
+  pointer-events: none;
+}
+.proj-hero > * { position: relative; }
+
+.ph-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.ph-brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.ph-brand h3 { min-width: 0; }
+.ph-brand img {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  display: block;
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.25), 0 4px 16px rgba(0, 0, 0, 0.45);
+}
+.ph-brand h3 {
+  margin: 0;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  color: #ffffff;
+}
+.ph-brand h3 span { color: var(--ph-cyan); }
+
+.ph-range {
+  font-size: 0.8rem;
+  color: var(--ph-dim);
+  font-variant-numeric: tabular-nums;
+  font-family: var(--ph-mono);
+  white-space: nowrap;
+  padding-top: 6px;
+}
+
+/* 「↗ 子站」角标：点明这是跳去别处的入口 */
+.ph-badge {
+  display: inline-block;
+  margin-top: 18px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 3px 11px;
+  border-radius: 999px;
+  color: var(--ph-cyan);
+  border: 1px solid rgba(34, 211, 238, 0.4);
+  background: rgba(34, 211, 238, 0.08);
+}
+
+.ph-summary {
+  margin: 14px 0 0;
+  max-width: 56ch;
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--ph-dim);
+}
+
+.ph-tech { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 20px 0 0; }
+.ph-tech li {
+  font-size: 0.78rem;
+  padding: 5px 11px;
+  border-radius: 8px;
+  background: var(--ph-bg2);
+  border: 1px solid var(--ph-line);
+  color: var(--ph-dim);
+  font-family: var(--ph-mono);
+}
+
+.ph-links { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 18px; }
+.ph-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ph-cyan);
+}
+.ph-links a:hover { text-decoration: none; opacity: 0.85; }
+.ph-links a span { font-size: 0.8em; }
+
+.ph-timeline {
+  list-style: none;
+  padding: 0;
+  margin: 22px 0 0;
+  border-left: 2px solid var(--ph-line);
+}
+.ph-timeline li { position: relative; padding: 4px 0 4px 18px; font-size: 0.85rem; color: var(--ph-dim); }
+.ph-timeline li::before {
+  content: '';
+  position: absolute;
+  left: -7px;
+  top: 10px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ph-cyan);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.14);
+}
+.ph-timeline .t-date { color: var(--ph-dim); opacity: 0.72; margin-right: 8px; font-variant-numeric: tabular-nums; }
+.ph-timeline .t-event { color: var(--ph-txt); }
+
+@media (max-width: 700px) {
+  .proj-hero { padding: 22px 18px 20px; }
+  .ph-brand img { width: 58px; height: 58px; border-radius: 13px; }
+  .ph-brand h3 { font-size: 1.35rem; letter-spacing: 0.08em; }
+  .ph-top { flex-direction: column; gap: 8px; }
+  .ph-range { padding-top: 0; }
+  .ph-tech li { font-size: 0.74rem; padding: 4px 9px; }
+}
 
 .empty {
   padding: 34px 22px;
