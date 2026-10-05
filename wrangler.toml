@@ -1,3 +1,6 @@
-name = "pai-personal-site"
+# 仅用于本地 `wrangler pages dev` 预览 Functions（可选）。
+# 线上部署走 Cloudflare Pages 的 Git 集成：构建命令 `npm run build`、输出目录 `dist`，
+# `functions/` 目录会被 Pages 自动识别为 Functions，无需 wrangler 直传。
+name = "personal-site"
 compatibility_date = "2025-10-01"
 pages_build_output_dir = "dist"

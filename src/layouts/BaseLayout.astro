@@ -111,6 +111,29 @@ const clientScript = `
       });
     }
 
+    /* 导航下拉：桌面靠 CSS :hover；移动端（≤880px）点按父项切换 .open */
+    document.querySelectorAll('[data-nav-dd]').forEach(function (item) {
+      var link = item.querySelector(':scope > a');
+      if (!link) return;
+      link.addEventListener('click', function (e) {
+        if (window.matchMedia('(max-width: 880px)').matches) {
+          e.preventDefault();
+          var open = item.classList.toggle('open');
+          link.setAttribute('aria-expanded', String(open));
+        }
+      });
+    });
+    /* 点击页面其它地方，收起展开的移动端下拉 */
+    document.addEventListener('click', function (e) {
+      document.querySelectorAll('[data-nav-dd].open').forEach(function (item) {
+        if (!item.contains(e.target)) {
+          item.classList.remove('open');
+          var l = item.querySelector(':scope > a');
+          if (l) l.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+
     /* 滚动浮现：进入视口后加 .in */
     var ros = document.querySelectorAll('.reveal-on-scroll');
     if ('IntersectionObserver' in window && ros.length) {

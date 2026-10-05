@@ -3,26 +3,83 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { DEFAULT_LANG, t } from '../i18n/ui';
 ---
 
-<BaseLayout titleKey="contact" description="联系与留言入口">
+<BaseLayout titleKey="contact" description="联系与留言">
   <h1 data-i18n="nav.contact">{t(DEFAULT_LANG, 'nav.contact')}</h1>
   <p class="lead" data-i18n="ui.contact.lead">{t(DEFAULT_LANG, 'ui.contact.lead')}</p>
-  <form
-    class="contact"
-    onsubmit="event.preventDefault(); alert('演示：后端尚未接入。');"
-  >
+
+  <form class="contact" data-contact novalidate>
     <label>
       <span data-i18n="ui.contact.name">{t(DEFAULT_LANG, 'ui.contact.name')}</span>
-      <input name="name" required />
+      <input name="name" maxlength="40" autocomplete="name" />
     </label>
     <label>
       <span data-i18n="ui.contact.email">{t(DEFAULT_LANG, 'ui.contact.email')}</span>
-      <input type="email" name="email" required />
+      <input name="contact" maxlength="80" autocomplete="email" />
     </label>
     <label>
       <span data-i18n="ui.contact.message">{t(DEFAULT_LANG, 'ui.contact.message')}</span>
-      <textarea name="message" rows="5" required></textarea>
+      <textarea name="message" rows="5" maxlength="2000" required></textarea>
     </label>
+
+    <!-- 蜜罐字段：正常访客看不见，机器人会填 → 后端静默丢弃 -->
+    <label class="hp-field" aria-hidden="true">
+      <span>请勿填写</span>
+      <input name="hp" tabindex="-1" autocomplete="off" />
+    </label>
+
     <button type="submit" data-i18n="ui.contact.submit">{t(DEFAULT_LANG, 'ui.contact.submit')}</button>
+    <p class="cmsg" data-contact-status role="status" aria-live="polite"></p>
   </form>
-  <div class="note" data-i18n="ui.contact.note">{t(DEFAULT_LANG, 'ui.contact.note')}</div>
+
+  <p class="note" data-i18n="ui.contact.note">{t(DEFAULT_LANG, 'ui.contact.note')}</p>
+
+  <script>
+    const form = document.querySelector<HTMLFormElement>('[data-contact]');
+    const status = document.querySelector<HTMLElement>('[data-contact-status]');
+    if (form && status) {
+      const say = (text: string, kind: 'ok' | 'err' | '') => {
+        status.textContent = text;
+        status.className = 'cmsg' + (kind ? ' ' + kind : '');
+      };
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(form);
+        const name = String(fd.get('name') || '').trim();
+        const contact = String(fd.get('contact') || '').trim();
+        const message = String(fd.get('message') || '').trim();
+        const hp = String(fd.get('hp') || '');
+
+        if (!message) { say('留言内容不能为空', 'err'); return; }
+        if (!name && !contact) { say('请至少留一个称呼或联系方式', 'err'); return; }
+        if (hp) { say('已收到，谢谢！', 'ok'); return; }   // 蜜罐：机器人静默丢弃
+
+        // 前端节流：同一浏览器 60 秒内只允许提交一次
+        const last = Number(localStorage.getItem('pfLast') || 0);
+        if (Date.now() - last < 60000) { say('发送太频繁，请一分钟后再试', 'err'); return; }
+
+        const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+        if (btn) btn.disabled = true;
+        say('发送中…');
+        try {
+          const r = await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, contact, message, hp }),
+          });
+          const data = await r.json().catch(() => ({} as { ok?: boolean; error?: string }));
+          if (r.ok && data.ok) {
+            localStorage.setItem('pfLast', String(Date.now()));
+            form.reset();
+            say('已收到，谢谢你的留言！', 'ok');
+          } else {
+            say(data.error || '发送失败，请稍后再试', 'err');
+          }
+        } catch {
+          say('网络异常，请稍后再试', 'err');
+        } finally {
+          if (btn) btn.disabled = false;
+        }
+      });
+    }
+  </script>
 </BaseLayout>

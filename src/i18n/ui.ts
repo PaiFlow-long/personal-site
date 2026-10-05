@@ -45,12 +45,12 @@ const zhCN: Dict = {
   'ui.status.done': '已完成',
   'ui.status.planned': '计划中',
 
-  'ui.contact.lead': '有合作、咨询或想说的话，填下面的表单。表单尚未接入后端，接入后会真正收到。',
+  'ui.contact.lead': '有合作、咨询，或只是想聊两句，填下面的表单。留言会直接进我的收件箱。',
   'ui.contact.name': '称呼',
-  'ui.contact.email': '邮箱',
+  'ui.contact.email': '联系方式',
   'ui.contact.message': '留言',
-  'ui.contact.submit': '提交留言',
-  'ui.contact.note': '说明：正式版将通过 Cloudflare Worker 写入 D1，并邮件通知。',
+  'ui.contact.submit': '发送留言',
+  'ui.contact.note': '说明：留言会写入数据库并邮件通知我，不会公开展示；请至少留一个称呼或联系方式，方便回你。',
 
   'ui.quote.label': '风中的纸屑',
   'ui.quote.next': '换一条',
@@ -83,12 +83,12 @@ const zhTW: Dict = {
   'ui.status.done': '已完成',
   'ui.status.planned': '計劃中',
 
-  'ui.contact.lead': '有合作、諮詢或想說的話，填下面的表單。表單尚未接入後端，接入後會真正收到。',
+  'ui.contact.lead': '有合作、諮詢，或只是想聊兩句，填下面的表單。留言會直接進我的信箱。',
   'ui.contact.name': '稱呼',
-  'ui.contact.email': '電子郵件',
+  'ui.contact.email': '聯絡方式',
   'ui.contact.message': '留言',
   'ui.contact.submit': '送出留言',
-  'ui.contact.note': '說明：正式版將透過 Cloudflare Worker 寫入 D1，並以郵件通知。',
+  'ui.contact.note': '說明：留言會寫入資料庫並以郵件通知我，不會公開展示；請至少留一個稱呼或聯絡方式，方便回你。',
 
   'ui.quote.label': '風中的紙屑',
   'ui.quote.next': '換一條',
@@ -121,12 +121,12 @@ const en: Dict = {
   'ui.status.done': 'Done',
   'ui.status.planned': 'Planned',
 
-  'ui.contact.lead': 'For collaboration, consulting or just to say hi, use the form below. It is not wired to a backend yet.',
+  'ui.contact.lead': 'For collaboration, consulting, or just to say hi, drop a note below — it goes straight to my inbox.',
   'ui.contact.name': 'Name',
-  'ui.contact.email': 'Email',
+  'ui.contact.email': 'Contact',
   'ui.contact.message': 'Message',
   'ui.contact.submit': 'Send',
-  'ui.contact.note': 'Note: the production version will write to Cloudflare D1 and notify by email.',
+  'ui.contact.note': 'Note: your message is stored in a database and emailed to me; it is never shown publicly. Please leave at least a name or a contact so I can reply.',
 
   'ui.quote.label': 'Scraps in the Wind',
   'ui.quote.next': 'Another scrap',

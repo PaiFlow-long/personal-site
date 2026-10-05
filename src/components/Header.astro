@@ -27,16 +27,45 @@ const isActive = (p: string) => (p === '/' ? path === '/' : path.startsWith(p))
     <div class="panel" data-panel>
       <nav class="main-nav" aria-label="Primary">
         {
-          NAV.map((item) => (
-            <a
-              href={item.path}
-              class={isActive(item.path) ? 'active' : ''}
-              aria-current={isActive(item.path) ? 'page' : undefined}
-              data-i18n={`nav.${item.key}`}
-            >
-              {t(DEFAULT_LANG, `nav.${item.key}`)}
-            </a>
-          ))
+          NAV.map((item) =>
+            item.children && item.children.length > 0 ? (
+              <div class={`nav-item has-dd${isActive(item.path) ? ' active' : ''}`} data-nav-dd>
+                <a
+                  href={item.path}
+                  class={isActive(item.path) ? 'active' : ''}
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  data-i18n={`nav.${item.key}`}
+                >
+                  {t(DEFAULT_LANG, `nav.${item.key}`)}
+                  <svg class="dd-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </a>
+                <div class="nav-dd" role="menu">
+                  {item.children.map((c) => (
+                    <a
+                      href={c.path}
+                      role="menuitem"
+                      class={isActive(c.path) ? 'active' : ''}
+                      data-i18n={`nav.${c.key}`}
+                    >
+                      {t(DEFAULT_LANG, `nav.${c.key}`)}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <a
+                href={item.path}
+                class={isActive(item.path) ? 'active' : ''}
+                aria-current={isActive(item.path) ? 'page' : undefined}
+                data-i18n={`nav.${item.key}`}
+              >
+                {t(DEFAULT_LANG, `nav.${item.key}`)}
+              </a>
+            )
+          )
         }
       </nav>
 

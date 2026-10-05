@@ -1,12 +1,13 @@
 import { defineConfig } from 'astro/config';
-import cloudflare from '@astrojs/cloudflare';
 
-// 公开部署目标：Cloudflare Pages。
-// Astro 5 的 output 默认即为 'static'，且已兼具 SSR 能力：
-// 默认全部预渲染为静态（零运维），到 P3 接入访客留言时，
-// 只需把 API 路由设为 `export const prerender = false` 即可用上 Worker/D1。
+// 公开部署目标：Cloudflare Pages（纯静态 + Pages Functions）。
+//
+// 为什么不用 @astrojs/cloudflare adapter：
+//   站点全部页面都是预渲染静态页；唯一的动态部分是留言接口，
+//   它由仓库根的 functions/api/contact.js（Cloudflare Pages Function）承担。
+//   adapter 会另外产出 _worker.js，与 functions/ 同时存在时 CF 只认 _worker.js，
+//   会导致 /api/contact 失效。故此处保持纯静态输出，让 functions/ 正常生效。
 export default defineConfig({
   output: 'static',
-  adapter: cloudflare(),
   site: 'https://paiflow.pages.dev',
 });

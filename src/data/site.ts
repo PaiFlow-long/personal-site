@@ -24,6 +24,8 @@ export interface NavItem {
   key: string
   /** 路径，'/' 为首页 */
   path: string
+  /** 下拉子项（可选）：鼠标悬停 / 点按父项时展开 */
+  children?: { key: string; path: string }[]
 }
 
 export const NAV: NavItem[] = [
@@ -32,6 +34,5 @@ export const NAV: NavItem[] = [
   { key: 'gallery', path: '/gallery' },
   { key: 'videos', path: '/videos' },
   { key: 'projects', path: '/projects' },
-  { key: 'about', path: '/about' },
-  { key: 'contact', path: '/contact' },
+  { key: 'about', path: '/about', children: [{ key: 'contact', path: '/contact' }] },
 ]
