@@ -3,15 +3,14 @@
  * 项目卡。
  *
  * 两种形态：
- *  1) 「大卡」—— 设了 logo 的项目走这条（目前只有 OpenStock）。
- *     通栏横排：左 logo，右内容；卡内自成一派的深色 + 青色主题，
- *     视觉上向子站本体靠拢，等于一个「子站入口」。
- *  2) 「小卡」—— 没 logo 的项目走原来的紧凑竖卡，保持主站奶油风。
+ *  1) 「横条卡」—— 设了 logo 的项目走这条（目前只有 OpenStock）。
+ *     左 logo 区 + 右内容区，横向构图，紧凑克制。
+ *  2) 「小卡」—— 没 logo 的项目走原来的紧凑竖卡。
  *
- * 加新项目时：想要大卡就补 logo: /xxx.png，其余字段随意。
+ * 加新项目时：想要横条卡就补 logo: /xxx.png，其余字段随意。
  */
 const { project } = Astro.props;
-const { title, status, summary, timeline, url, logo, tech, links, start, end } =
+const { title, status, summary, url, logo, tech, links, start, end } =
   project.data;
 
 const statusLabel: Record<string, string> = {
@@ -21,7 +20,7 @@ const statusLabel: Record<string, string> = {
   planned: '计划中',
 };
 
-/** 时间区间，形如 2026.09 – 至今 */
+/** 时间区间，形如 2026.09 – 2026.10；进行中则显示「2026.09 – 至今」 */
 function fmt(d: Date) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -29,64 +28,48 @@ function fmt(d: Date) {
 }
 const range = start ? `${fmt(start)} – ${end ? fmt(end) : '至今'}` : null;
 
+const allLinks =
+  links && links.length > 0 ? links : url ? [{ label: '访问站点', href: url }] : [];
+
 const clickable = Boolean(url) && !logo;
 ---
 
 {
   logo ? (
-    <article class="proj-hero">
-      <div class="ph-top">
-        <div class="ph-brand">
-          <img src={logo} alt={`${title} logo`} width="72" height="72" loading="lazy" />
-          <h3>
-            OPEN <span>STOCK</span>
-          </h3>
-        </div>
-        {range && <div class="ph-range">{range}</div>}
+    <article class="proj-wide">
+      <div class="pw-logo">
+        <img src={logo} alt={`${title} logo`} width="96" height="96" loading="lazy" />
       </div>
 
-      <span class="ph-badge">↗ 子站</span>
+      <div class="pw-body">
+        <div class="pw-head">
+          <h3>{title}</h3>
+          {range && <span class="pw-range">{range}</span>}
+        </div>
 
-      {summary && <p class="ph-summary">{summary}</p>}
+        {summary && <p class="pw-summary">{summary}</p>}
 
-      {
-        tech && tech.length > 0 && (
-          <ul class="ph-tech">
-            {tech.map((t: string) => (
-              <li>{t}</li>
-            ))}
-          </ul>
-        )
-      }
+        <div class="pw-foot">
+          {tech && tech.length > 0 && (
+            <ul class="pw-tech">
+              {tech.map((t: string) => (
+                <li>{t}</li>
+              ))}
+            </ul>
+          )}
 
-      {
-        (links && links.length > 0) || url ? (
-          <div class="ph-links">
-            {(links && links.length > 0
-              ? links
-              : [{ label: '访问站点', href: url }]
-            ).map((l: { label: string; href: string }) => (
-              <a href={l.href} target="_blank" rel="noopener">
-                {l.label}
-                <span aria-hidden="true">↗</span>
-              </a>
-            ))}
-          </div>
-        ) : null
-      }
-
-      {
-        timeline && timeline.length > 0 && (
-          <ol class="ph-timeline">
-            {timeline.map((t: { date: Date; event: string }) => (
-              <li>
-                <span class="t-date">{t.date.toLocaleDateString('zh-CN')}</span>
-                <span class="t-event">{t.event}</span>
-              </li>
-            ))}
-          </ol>
-        )
-      }
+          {allLinks.length > 0 && (
+            <div class="pw-links">
+              {allLinks.map((l: { label: string; href: string }) => (
+                <a href={l.href} target="_blank" rel="noopener">
+                  {l.label}
+                  <span aria-hidden="true">↗</span>
+                </a>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </article>
   ) : clickable ? (
     <a class="card project external" href={url} target="_blank" rel="noopener">

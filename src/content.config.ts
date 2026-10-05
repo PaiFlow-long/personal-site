@@ -28,9 +28,6 @@ const projects = defineCollection({
     links: z
       .array(z.object({ label: z.string(), href: z.string() }))
       .optional(),
-    timeline: z
-      .array(z.object({ date: z.date(), event: z.string() }))
-      .optional(),
   }),
 })
 

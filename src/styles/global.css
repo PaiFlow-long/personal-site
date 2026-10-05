@@ -563,9 +563,9 @@ html:not(.js) .qs-live { display: none; }
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   margin-top: 16px;
 }
-/* 项目页：大卡通栏，小卡才走多列网格 */
-.grid.projects > .proj-hero { grid-column: 1 / -1; }
-.grid.projects:has(> .proj-hero) { grid-template-columns: 1fr; }
+/* 项目页：横条卡通栏，小卡才走多列网格 */
+.grid.projects > .proj-wide { grid-column: 1 / -1; }
+.grid.projects:has(> .proj-wide) { grid-template-columns: 1fr; }
 .card {
   display: block;
   padding: 18px;
@@ -599,20 +599,6 @@ html:not(.js) .qs-live { display: none; }
 .status-done { background: color-mix(in srgb, var(--gray) 16%, var(--card)); color: var(--gray); }
 .status-planned { background: color-mix(in srgb, var(--gold) 20%, var(--card)); color: var(--gold-deep); }
 
-.timeline { list-style: none; padding: 0; margin: 12px 0 0; border-left: 2px solid var(--border); }
-.timeline li { position: relative; padding: 4px 0 4px 18px; font-size: 0.85rem; }
-.timeline li::before {
-  content: '';
-  position: absolute;
-  left: -7px;
-  top: 10px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--gold);
-}
-.t-date { color: var(--muted); margin-right: 8px; font-variant-numeric: tabular-nums; }
-
 .section-title { display: flex; align-items: baseline; justify-content: space-between; margin: 30px 0 4px; }
 .section-title h2 { margin: 0; }
 .intro { color: var(--muted); max-width: 680px; margin: 14px 0 18px; font-size: 1rem; }
@@ -639,149 +625,101 @@ html:not(.js) .qs-live { display: none; }
 }
 .card.project.external { border-color: color-mix(in srgb, var(--gold) 45%, var(--border)); }
 
-/* ---------------- 项目 · 大卡（子站入口） ----------------
-   卡内自成一派的深色 + 青色主题，向子站本体（OpenStock）靠拢。
-   全部变量与规则都用 .proj-hero 作用域，不影响主站其余部分。 */
-.proj-hero {
-  --ph-bg: #0a0e18;
-  --ph-bg2: #111827;
-  --ph-line: #1e293b;
-  --ph-txt: #e2e8f0;
-  --ph-dim: #94a3b8;
-  --ph-cyan: #22d3ee;
-  --ph-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-
-  position: relative;
-  overflow: hidden;
-  /* 不收满整栏：太宽会显得空，留出一点呼吸感 */
-  max-width: 760px;
-  /* 窄屏下别被网格/内容顶出去 */
+/* ---------------- 项目 · 横条卡（子站入口） ----------------
+   左 logo 区 + 右内容区，紧凑横排。配色跟随主站（奶油底 / 苹果红），
+   只在标签与链接上用一点青色呼应子站。 */
+.proj-wide {
+  display: grid;
+  grid-template-columns: 168px 1fr;
+  align-items: stretch;
+  max-width: 780px;
   width: 100%;
   min-width: 0;
-  padding: 28px 30px 24px;
-  border-radius: 18px;
-  border: 1px solid var(--ph-line);
-  background: var(--ph-bg);
-  color: var(--ph-txt);
-  /* 子站同款 44px 网格暗纹 */
-  background-image:
-    linear-gradient(rgba(34, 211, 238, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(34, 211, 238, 0.045) 1px, transparent 1px);
-  background-size: 44px 44px, 44px 44px;
-  box-shadow: 0 14px 40px rgba(10, 14, 24, 0.28);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-/* 左上角一圈青色光晕，压住网格的冷感 */
-.proj-hero::before {
-  content: '';
-  position: absolute;
-  inset: -40% 40% 40% -20%;
-  background: radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.12), transparent 62%);
-  pointer-events: none;
+.proj-wide:hover {
+  border-color: color-mix(in srgb, var(--accent) 26%, var(--border));
+  box-shadow: 0 10px 26px rgba(232, 72, 43, 0.08);
 }
-.proj-hero > * { position: relative; }
 
-.ph-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
-.ph-brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
-.ph-brand h3 { min-width: 0; }
-.ph-brand img {
-  width: 72px;
-  height: 72px;
-  border-radius: 16px;
+/* 左侧 logo 区：一块极浅的底，和右侧内容微微分开 */
+.pw-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px 18px;
+  background: color-mix(in srgb, var(--border) 34%, var(--card));
+  border-right: 1px solid var(--border);
+}
+.pw-logo img {
+  width: 96px;
+  height: 96px;
+  border-radius: 20px;
   display: block;
-  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.25), 0 4px 16px rgba(0, 0, 0, 0.45);
-}
-.ph-brand h3 {
-  margin: 0;
-  font-size: 1.9rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  line-height: 1;
-  color: #ffffff;
-}
-.ph-brand h3 span { color: var(--ph-cyan); }
-
-.ph-range {
-  font-size: 0.8rem;
-  color: var(--ph-dim);
-  font-variant-numeric: tabular-nums;
-  font-family: var(--ph-mono);
-  white-space: nowrap;
-  padding-top: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.14);
 }
 
-/* 「↗ 子站」角标：点明这是跳去别处的入口 */
-.ph-badge {
-  display: inline-block;
-  margin-top: 18px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  padding: 3px 11px;
-  border-radius: 999px;
-  color: var(--ph-cyan);
-  border: 1px solid rgba(34, 211, 238, 0.4);
-  background: rgba(34, 211, 238, 0.08);
-}
+.pw-body { padding: 20px 24px; min-width: 0; display: flex; flex-direction: column; }
 
-.ph-summary {
-  margin: 14px 0 0;
-  max-width: 56ch;
-  font-size: 0.95rem;
-  line-height: 1.75;
-  color: var(--ph-dim);
-}
-
-.ph-tech { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 20px 0 0; }
-.ph-tech li {
+.pw-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.pw-head h3 { margin: 0; font-size: 1.02rem; font-weight: 700; color: var(--fg); }
+.pw-range {
+  flex: none;
   font-size: 0.78rem;
-  padding: 5px 11px;
-  border-radius: 8px;
-  background: var(--ph-bg2);
-  border: 1px solid var(--ph-line);
-  color: var(--ph-dim);
-  font-family: var(--ph-mono);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
-.ph-links { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 18px; }
-.ph-links a {
+.pw-summary {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.pw-foot { margin-top: auto; padding-top: 14px; }
+.pw-tech { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 0; }
+.pw-tech li {
+  font-size: 0.74rem;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--border) 55%, var(--card));
+  border: 1px solid var(--border);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.pw-links { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; }
+.pw-links a {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.88rem;
+  gap: 5px;
+  font-size: 0.85rem;
   font-weight: 600;
-  color: var(--ph-cyan);
+  color: #0e7490;
 }
-.ph-links a:hover { text-decoration: none; opacity: 0.85; }
-.ph-links a span { font-size: 0.8em; }
+:root[data-theme='dark'] .pw-links a { color: #22d3ee; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .pw-links a { color: #22d3ee; }
+}
+.pw-links a:hover { text-decoration: none; opacity: 0.8; }
+.pw-links a span { font-size: 0.78em; }
 
-.ph-timeline {
-  list-style: none;
-  padding: 0;
-  margin: 22px 0 0;
-  border-left: 2px solid var(--ph-line);
-}
-.ph-timeline li { position: relative; padding: 4px 0 4px 18px; font-size: 0.85rem; color: var(--ph-dim); }
-.ph-timeline li::before {
-  content: '';
-  position: absolute;
-  left: -7px;
-  top: 10px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--ph-cyan);
-  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.14);
-}
-.ph-timeline .t-date { color: var(--ph-dim); opacity: 0.72; margin-right: 8px; font-variant-numeric: tabular-nums; }
-.ph-timeline .t-event { color: var(--ph-txt); }
-
-@media (max-width: 700px) {
-  .proj-hero { padding: 22px 18px 20px; }
-  .ph-brand img { width: 58px; height: 58px; border-radius: 13px; }
-  .ph-brand h3 { font-size: 1.35rem; letter-spacing: 0.08em; }
-  .ph-top { flex-direction: column; gap: 8px; }
-  .ph-range { padding-top: 0; }
-  .ph-tech li { font-size: 0.74rem; padding: 4px 9px; }
+@media (max-width: 620px) {
+  .proj-wide { grid-template-columns: 1fr; max-width: 100%; }
+  .pw-logo {
+    padding: 18px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .pw-logo img { width: 66px; height: 66px; border-radius: 14px; }
+  .pw-body { padding: 16px 18px; }
+  .pw-head { flex-direction: column; gap: 2px; }
 }
 
 .empty {
