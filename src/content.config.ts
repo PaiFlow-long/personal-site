@@ -2,16 +2,20 @@ import { defineCollection, z } from 'astro:content'
 
 const articles = defineCollection({
   type: 'content',
-  schema: z.object({
-    title: z.string(),
-    date: z.date(),
-    category: z.string().optional(),
-    summary: z.string().optional(),
-    /** 外链：填了就表示全文在别处（如微信公众号），卡片直接跳转，不生成本地详情页 */
-    link: z.string().optional(),
-    /** 外链的出处名，显示在卡片上，如「微信公众号」 */
-    source: z.string().optional(),
-  }),
+  // image() 由 schema 函数注入（Astro 5 的写法），不能从 astro:assets 直接 import
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      date: z.date(),
+      category: z.string().optional(),
+      summary: z.string().optional(),
+      /** 封面图：放 src/assets/covers/ 下，路径相对本 md 文件写 */
+      cover: image().optional(),
+      /** 外链：填了就表示全文在别处（如微信公众号），卡片直接跳转，不生成本地详情页 */
+      link: z.string().optional(),
+      /** 外链的出处名，显示在卡片上，如「微信公众号」 */
+      source: z.string().optional(),
+    }),
 })
 
 const projects = defineCollection({

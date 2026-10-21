@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { DEFAULT_LANG, t } from '../../i18n/ui';
 
@@ -11,28 +12,48 @@ const articles = (await getCollection('articles')).sort(
 <BaseLayout titleKey="articles" description="PaiFlow苹果派 · 文章">
   <h1 data-i18n="nav.articles">{t(DEFAULT_LANG, 'nav.articles')}</h1>
   <p class="lead" data-i18n="ui.articles.lead">{t(DEFAULT_LANG, 'ui.articles.lead')}</p>
-  <div class="grid articles">
+
+  <div class="art-list">
     {
       articles.map((a) => {
-        // 填了 link 的条目全文在别处：卡片直接跳外链，不落地到本站详情页
+        // 填了 link 的条目全文在别处：整行直接跳外链，不落地到本站详情页
         const external = Boolean(a.data.link);
         return (
           <a
-            class={`card${external ? ' external' : ''}`}
+            class="art-row"
             href={external ? a.data.link : `/articles/${a.slug}`}
             target={external ? '_blank' : undefined}
             rel={external ? 'noopener' : undefined}
           >
-            <h3>{a.data.title}</h3>
-            <p class="meta">
-              {a.data.date.toLocaleDateString('zh-CN')}
-              {a.data.category ? ' · ' + a.data.category : ''}
-            </p>
-            {a.data.summary && <p>{a.data.summary}</p>}
-            {external && (
-              <p class="card-source">
-                ↗ {a.data.source || '阅读全文'}
-              </p>
+            <div class="ar-text">
+              <div class="ar-head">
+                <span class="ar-who">
+                  <img src="/favicon.svg" alt="" width="22" height="22" />
+                  {a.data.source || 'PaiFlow苹果派'}
+                </span>
+                <span class="ar-date">{a.data.date.toLocaleDateString('zh-CN')}</span>
+              </div>
+
+              <h2 class="ar-title">{a.data.title}</h2>
+
+              <div class="ar-foot">
+                {a.data.category && <span class="ar-tag">{a.data.category}</span>}
+                {a.data.summary && <span class="ar-sum">{a.data.summary}</span>}
+              </div>
+            </div>
+
+            {a.data.cover && (
+              <div class="ar-cover">
+                <Image
+                  src={a.data.cover}
+                  alt=""
+                  width={440}
+                  height={248}
+                  widths={[240, 440]}
+                  sizes="(max-width: 640px) 120px, 220px"
+                  loading="lazy"
+                />
+              </div>
             )}
           </a>
         );

@@ -567,9 +567,92 @@ html:not(.js) .qs-live { display: none; }
 .grid.projects > .proj-wide { grid-column: 1 / -1; }
 .grid.projects:has(> .proj-wide) { grid-template-columns: 1fr; }
 
-/* 文章页：卡片比默认宽一些，标题不至于一行写不下 */
-.grid.articles { grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr)); }
-.grid.articles .card h3 { font-size: 1.12rem; line-height: 1.45; }
+/* ---------------- 文章 · 一行一条 ----------------
+   参照微信的图文卡：左文字（号名/日期 → 标题 → 分类+摘要），右 16:9 封面。 */
+.art-list { margin-top: 10px; border-top: 1px solid var(--border); }
+.art-row {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--fg);
+}
+.art-row:hover { text-decoration: none; }
+.art-row:hover .ar-title { color: var(--accent); }
+
+.ar-text { flex: 1; min-width: 0; }
+
+.ar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.79rem;
+  color: var(--muted);
+}
+.ar-who { display: inline-flex; align-items: center; gap: 8px; }
+.ar-who img { border-radius: 50%; display: block; }
+.ar-date { flex: none; font-variant-numeric: tabular-nums; }
+
+.ar-title {
+  margin: 11px 0 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: -0.008em;
+  color: var(--fg);
+  transition: color 0.15s ease;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ar-foot { display: flex; align-items: center; gap: 12px; margin-top: 11px; min-width: 0; }
+.ar-tag {
+  flex: none;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 5px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.ar-sum {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ar-cover { flex: none; width: 212px; }
+.ar-cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 10px;
+  background: var(--border);
+}
+
+@media (max-width: 640px) {
+  .art-row { gap: 12px; padding: 16px 0; align-items: flex-start; }
+  .art-row + .art-row { margin-top: 0; }
+  .ar-head { font-size: 0.74rem; }
+  .ar-who { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .ar-title { font-size: 1rem; margin-top: 6px; -webkit-line-clamp: 3; }
+  .ar-cover { width: 104px; }
+  .ar-cover img { aspect-ratio: 4 / 3; border-radius: 7px; }
+  .ar-sum { display: none; }
+  .ar-foot { margin-top: 8px; }
+}
+
 .card {
   display: block;
   padding: 18px;
@@ -588,14 +671,6 @@ html:not(.js) .qs-live { display: none; }
 .card h3 { margin: 0 0 6px; font-size: 1.06rem; color: var(--fg); }
 .card .meta { color: var(--muted); font-size: 0.82rem; margin: 0; }
 .card p { color: var(--muted); font-size: 0.9rem; margin: 6px 0 0; }
-
-/* 文章卡片：全文在别处时的「↗ 出处」提示 */
-.card .card-source {
-  margin: 10px 0 0;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--accent);
-}
 
 .tag {
   display: inline-block;
