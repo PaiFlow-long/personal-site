@@ -566,6 +566,10 @@ html:not(.js) .qs-live { display: none; }
 /* 项目页：横条卡通栏，小卡才走多列网格 */
 .grid.projects > .proj-wide { grid-column: 1 / -1; }
 .grid.projects:has(> .proj-wide) { grid-template-columns: 1fr; }
+
+/* 文章页：卡片比默认宽一些，标题不至于一行写不下 */
+.grid.articles { grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr)); }
+.grid.articles .card h3 { font-size: 1.12rem; line-height: 1.45; }
 .card {
   display: block;
   padding: 18px;
@@ -584,6 +588,14 @@ html:not(.js) .qs-live { display: none; }
 .card h3 { margin: 0 0 6px; font-size: 1.06rem; color: var(--fg); }
 .card .meta { color: var(--muted); font-size: 0.82rem; margin: 0; }
 .card p { color: var(--muted); font-size: 0.9rem; margin: 6px 0 0; }
+
+/* 文章卡片：全文在别处时的「↗ 出处」提示 */
+.card .card-source {
+  margin: 10px 0 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+}
 
 .tag {
   display: inline-block;

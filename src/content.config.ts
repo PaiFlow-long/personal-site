@@ -7,6 +7,10 @@ const articles = defineCollection({
     date: z.date(),
     category: z.string().optional(),
     summary: z.string().optional(),
+    /** 外链：填了就表示全文在别处（如微信公众号），卡片直接跳转，不生成本地详情页 */
+    link: z.string().optional(),
+    /** 外链的出处名，显示在卡片上，如「微信公众号」 */
+    source: z.string().optional(),
   }),
 })
 

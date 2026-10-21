@@ -11,18 +11,32 @@ const articles = (await getCollection('articles')).sort(
 <BaseLayout titleKey="articles" description="PaiFlow苹果派 · 文章">
   <h1 data-i18n="nav.articles">{t(DEFAULT_LANG, 'nav.articles')}</h1>
   <p class="lead" data-i18n="ui.articles.lead">{t(DEFAULT_LANG, 'ui.articles.lead')}</p>
-  <div class="grid">
+  <div class="grid articles">
     {
-      articles.map((a) => (
-        <a class="card" href={`/articles/${a.slug}`}>
-          <h3>{a.data.title}</h3>
-          <p class="meta">
-            {a.data.date.toLocaleDateString('zh-CN')}
-            {a.data.category ? ' · ' + a.data.category : ''}
-          </p>
-          {a.data.summary && <p>{a.data.summary}</p>}
-        </a>
-      ))
+      articles.map((a) => {
+        // 填了 link 的条目全文在别处：卡片直接跳外链，不落地到本站详情页
+        const external = Boolean(a.data.link);
+        return (
+          <a
+            class={`card${external ? ' external' : ''}`}
+            href={external ? a.data.link : `/articles/${a.slug}`}
+            target={external ? '_blank' : undefined}
+            rel={external ? 'noopener' : undefined}
+          >
+            <h3>{a.data.title}</h3>
+            <p class="meta">
+              {a.data.date.toLocaleDateString('zh-CN')}
+              {a.data.category ? ' · ' + a.data.category : ''}
+            </p>
+            {a.data.summary && <p>{a.data.summary}</p>}
+            {external && (
+              <p class="card-source">
+                ↗ {a.data.source || '阅读全文'}
+              </p>
+            )}
+          </a>
+        );
+      })
     }
   </div>
 </BaseLayout>
