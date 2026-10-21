@@ -38,7 +38,6 @@ const articles = (await getCollection('articles')).sort(
 
               <div class="ar-foot">
                 {a.data.category && <span class="ar-tag">{a.data.category}</span>}
-                {a.data.summary && <span class="ar-sum">{a.data.summary}</span>}
               </div>
             </div>
 
@@ -47,10 +46,10 @@ const articles = (await getCollection('articles')).sort(
                 <Image
                   src={a.data.cover}
                   alt=""
-                  width={440}
-                  height={248}
-                  widths={[240, 440]}
-                  sizes="(max-width: 640px) 120px, 220px"
+                  width={560}
+                  height={315}
+                  widths={[280, 560]}
+                  sizes="(max-width: 640px) 112px, 268px"
                   loading="lazy"
                 />
               </div>
